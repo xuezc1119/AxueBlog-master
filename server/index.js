@@ -11,8 +11,7 @@ const app = express();
 
 // 跨域
 app.use(cors());
-// app.use(bodyParser.json()); // 读取本地json
-// app.use(express.bodyParser({ uploadDir: "../static/img/test" }));
+app.use(bodyParser.json()); // 读取本地json
 app.use(api);
 app.use(cookieParser());
 
