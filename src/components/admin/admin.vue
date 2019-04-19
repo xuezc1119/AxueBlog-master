@@ -20,13 +20,8 @@
       <div class = "right-content">
         <div class = "content-box">
           <!-- 博客管理 -->
-          <Table v-if = "!isNew" :columns="tableTitle" :data="tableData">
-            <template slot-scope="{ row, index }" slot="action">
-              <Button type="primary" size="small" style="margin-right: 5px" @click="show(index)">编辑</Button>
-              <Button type="error" size="small" @click="remove(index)">删除</Button>
-            </template>
-          </Table>
           <new-blog v-if = "isNew"></new-blog>
+          <blog-manage v-else></blog-manage>
         </div>
       </div>
     </div>
@@ -35,60 +30,28 @@
 
 <script>
 import newBlog from './new-blog';
+import blogManage from './manage';
 
 export default {
   name: 'admin',
   data () {
     return {
       myPic: './static/img/blog.jpg',
-      isNew: false, // 进入页面默认显示文章管理
-      tableTitle: [
-        {
-            title: '创建时间',
-            key: 'time'
-        },
-        {
-            title: '文章标题',
-            key: 'title'
-        },
-        {
-            title: '操作',
-            align: 'center',
-            slot: 'action'
-        }
-      ],
-      tableData: [],
-      pdfImg: ''
+      isNew: false // 进入页面默认显示文章管理
     }
   },
-  created () {
-    this.getArticleList();
-  },
   methods: {
-    show () {
-      console.log('show');
-    },
-    remove () {
-      console.log('remove');
-    },
     writeBlog (e) { // 切换写文章和文章管理
       if (e === 'write-blog') {
         this.isNew = true;
       } else if (e === 'manage-blog') {
         this.isNew = false;
       }
-    },
-    getArticleList () { // 获取文章列表
-      this.$axios.post('/api/getArticleList').then(res => {
-        console.log(res.data);
-        this.tableData = res.data;
-      }).catch(err => {
-        console.log(`获取文章列表catch: ${err}`);
-      });
     }
   },
   components: {
-    'new-blog': newBlog
+    'new-blog': newBlog,
+    'blog-manage': blogManage
   }
 }
 </script>
