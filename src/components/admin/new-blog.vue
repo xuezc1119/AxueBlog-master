@@ -25,7 +25,11 @@
       </div>
     </div>
     <div class = "blog-add">
-      <Button type="success" @click = "addArticle">添加</Button>
+      <Button type="success" @click = "addArticle" v-if = "way === ''">添加</Button>
+      <Button type="success" @click = "updateArticle" v-else>更新</Button>
+    </div>
+    <div class = "blog-back" v-show = "way !== ''" @click.stop = "blogBack">
+      <Icon type="md-return-left" size = "24" />
     </div>
   </div>
 </template>
@@ -33,6 +37,16 @@
 <script>
 export default {
   name: 'new-blog',
+  props: {
+    way: {
+      type: String,
+      default: ''
+    },
+    articleInfoDetails: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data () {
     return {
       articleContent: '',
@@ -41,6 +55,13 @@ export default {
       articleImgUrl: '',
       articleInfo: {} // 存储文章内容
     }
+  },
+  created () {
+    if (this.way === '') return;
+    this.articleContent = this.articleInfoDetails.content;
+    this.articleTitle = this.articleInfoDetails.title;
+    this.articleAbstract = this.articleInfoDetails.abstract;
+    this.articleImgUrl = this.articleInfoDetails.img;
   },
   methods: {
     onEditorBlur(editor){//失去焦点事件 
@@ -51,7 +72,7 @@ export default {
     //this.content可以实时获取到当前编辑器内的文本内容
     // console.log(this.content);
     },
-    addArticle () {
+    addArticle () { // 添加文章
       if (this.articleTitle === '') {
         this.$Message.info('请填写标题！');
         return;
@@ -90,6 +111,12 @@ export default {
         console.log(`写入文章catch：${err}`);
         this.$Message.info(`添加失败！${err}`);
       });
+    },
+    updateArticle () { // 更新文章
+      console.log('更新文章');
+    },
+    blogBack () { // 更新文章的返回
+      this.$emit('blogBack');
     }
   }
 }
@@ -180,4 +207,9 @@ export default {
           height: 80%
   .blog-add
     width: 100%
+  .blog-back
+    position: absolute
+    top: 10px
+    left: 10px
+    cursor: pointer
 </style>

@@ -39,4 +39,15 @@ router.post('/api/getArticleList', (req, res) => {
   })
 })
 
+// 删除文章
+router.post('/api/admin/deleteArticle', (req, res) => {
+  db.Article.remove({_id: req.body.articleId}, (err) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    res.send({'status': 1});
+  })
+})
+
 module.exports = router;

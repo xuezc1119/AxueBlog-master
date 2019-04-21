@@ -1,15 +1,33 @@
 <template>
   <div class="manage">
-    <Table :columns="tableTitle" :data="tableData">
+    <Table :columns = "tableTitle" :data = "tableData">
       <template slot-scope="{ row, index }" slot="action">
-        <Button type="primary" size="small" style="margin-right: 5px" @click="show(index)">编辑</Button>
-        <Button type="error" size="small" @click="remove(index)">删除</Button>
+        <Button type = "primary" size = "small" style = "margin-right: 5px" @click = "selectItem('edit', tableData, index)">编辑</Button>
+        <Button type = "error" size = "small" @click = "selectItem('del', tableData, index)">删除</Button>
       </template>
     </Table>
+    <Modal
+      v-model = "showTip"
+      :closable = "false"
+      :styles = "{width: '25%'}">
+      <p slot="header" style="color:#f60">
+        <Icon type="ios-information-circle"></Icon>
+      </p>
+      <div style = "text-align: center">
+        <p>您确定要删除吗?</p>
+      </div>
+      <div slot="footer" style = "text-align: center">
+        <Button type = "error" size="large" :loading="delLoading" @click = "confirmDel">确定</Button>
+      </div>
+    </Modal>
+    <div class = "manage-edit" v-if = "showDetails">
+      <edit-blog :articleInfoDetails = "articleDetails" way = "edit" @blogBack = "showDetails = false"></edit-blog>
+    </div>
   </div>
 </template>
 
 <script>
+import editBlog from './new-blog.vue';
 
 export default {
   name: 'manage',
@@ -30,18 +48,50 @@ export default {
             slot: 'action'
         }
       ],
-      tableData: []
+      tableData: [],
+      showTip: false,
+      delLoading: false,
+      articleId: '', // 选择要删除的文章id
+      articleDetails: {}, // 存储文章所有内容
+      showDetails: false
     }
   },
   created () {
     this.getArticleList();
   },
   methods: {
-    show () {
-      console.log('show');
+    confirmDel () { // 删除文章
+      this.delLoading = true;
+      let articleInfo = {
+        articleId: this.articleId
+      };
+      this.$axios.post('/api/admin/deleteArticle', articleInfo).then(res => {
+        if (res.data.status === 1) {
+          this.delLoading = false;
+          this.showTip = false;
+          this.$Message.info('删除成功！');
+          this.getArticleList();
+        } else {
+          this.delLoading = false;
+          this.showTip = false;
+          this.$Message.info('删除失败！');
+        }
+      }).catch(err => {
+        this.delLoading = false;
+        this.showTip = false;
+        this.$Message.info('删除失败！');
+        console.log(`删除文章catch：${err}`);
+      });
     },
-    remove () {
-      console.log('remove');
+    selectItem (condition, val, index) { // 选中一篇文章的操作
+      if (condition === 'del') {
+        this.showTip = true;
+        this.articleId = val[index]._id;
+      } else {
+        this.articleDetails = val[index];
+        this.showDetails = true;
+        console.log('编辑文章');
+      }
     },
     getArticleList () { // 获取文章列表
       this.$axios.post('/api/getArticleList').then(res => {
@@ -51,6 +101,10 @@ export default {
         console.log(`获取文章列表catch: ${err}`);
       });
     }
+  },
+
+  components: {
+    'edit-blog': editBlog
   }
 }
 </script>
@@ -62,4 +116,12 @@ export default {
   display: flex
   justify-content: center
   position: relative
+  .manage-edit
+    position: absolute
+    background: #fff
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    z-index: 50
 </style>
