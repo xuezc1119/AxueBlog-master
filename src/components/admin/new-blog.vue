@@ -70,9 +70,21 @@ export default {
     },
     onEditorChange({editor,html,text}){//编辑器文本发生变化
     //this.content可以实时获取到当前编辑器内的文本内容
-    // console.log(this.content);
     },
-    addArticle () { // 添加文章
+    contentDataBase () {
+      let articleDetails = {
+        title: this.articleTitle,
+        abstract: this.articleAbstract,
+        content: this.articleContent.substring(3, this.articleContent.length - 4),
+        img: this.articleImgUrl,
+        date: this.$moment().format('YYYY-MM-DD')
+      }
+      if (this.way !== '') { // 更新文章的话就要获取相应的_id
+        articleDetails._id = this.articleInfoDetails._id;
+      }
+      this.articleInfo = articleDetails;
+    },
+    async addArticle () { // 添加文章
       if (this.articleTitle === '') {
         this.$Message.info('请填写标题！');
         return;
@@ -89,14 +101,7 @@ export default {
         this.$Message.info('请填写图片地址');
         return;
       }
-      let articleDetails = {
-        title: this.articleTitle,
-        abstract: this.articleAbstract,
-        content: this.articleContent.substring(3, this.articleContent.length - 4),
-        img: this.articleImgUrl,
-        date: this.$moment().format('YYYY-MM-DD')
-      }
-      this.articleInfo = articleDetails;
+      await this.contentDataBase();
       this.$axios.post('/api/admin/saveArticle', this.articleInfo).then(res => {
         if (res.data.status === 1) {
           this.$Message.info('添加成功！');
@@ -112,8 +117,35 @@ export default {
         this.$Message.info(`添加失败！${err}`);
       });
     },
-    updateArticle () { // 更新文章
-      console.log('更新文章');
+    async updateArticle () { // 更新文章
+      if (this.articleTitle === '') {
+        this.$Message.info('请填写标题！');
+        return;
+      }
+      if (this.articleAbstract === '') {
+        this.$Message.info('请填写摘要！');
+        return;
+      }
+      if (this.articleContent === '') {
+        this.$Message.info('请填写内容');
+        return;
+      }
+      if (this.articleImgUrl === '') {
+        this.$Message.info('请填写图片地址');
+        return;
+      }
+      await this.contentDataBase();
+      this.$axios.post('/api/admin/updateArticle', {articleDetails: this.articleInfo}).then(res => {
+        if (res.data.status === 1) {
+          this.$Message.info('更新成功！');
+          this.$emit('blogBack', 1);
+        } else {
+          this.$Message.info('更新失败！');
+        }
+      }).catch(err => {
+        this.$Message.info('更新失败！');
+        console.log(`更新文章catch：${err}`);
+      });
     },
     blogBack () { // 更新文章的返回
       this.$emit('blogBack');

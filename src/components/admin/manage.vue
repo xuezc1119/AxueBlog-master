@@ -21,7 +21,7 @@
       </div>
     </Modal>
     <div class = "manage-edit" v-if = "showDetails">
-      <edit-blog :articleInfoDetails = "articleDetails" way = "edit" @blogBack = "showDetails = false"></edit-blog>
+      <edit-blog :articleInfoDetails = "articleDetails" way = "edit" @blogBack = "backUpdate"></edit-blog>
     </div>
   </div>
 </template>
@@ -100,6 +100,12 @@ export default {
       }).catch(err => {
         console.log(`获取文章列表catch: ${err}`);
       });
+    },
+    backUpdate (val) {
+      this.showDetails = false;
+      if (!val) return;
+      // 更新文章后返回就要重新加载数据
+      this.getArticleList();
     }
   },
 
