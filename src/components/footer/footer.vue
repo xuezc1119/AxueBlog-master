@@ -1,6 +1,5 @@
 <template>
   <div class="footer">
-    <router-view></router-view>
     <div class = "footer-box">
       @2019 Axue Design. All Right Reserved.
     </div>
@@ -20,9 +19,9 @@ export default {
 <style lang="stylus" rel="stylesheet/stylus" scoped>
 .footer
   display: flex
-  flex-direction: column
   align-items: center
   justify-content: center
+  width: 100%
   .footer-box
     width: 100%
     height: 80px

@@ -36,7 +36,7 @@ export default {
   name: 'admin',
   data () {
     return {
-      myPic: './static/img/blog.jpg',
+      myPic: './static/img/content-img/head.jpg',
       isNew: false // 进入页面默认显示文章管理
     }
   },

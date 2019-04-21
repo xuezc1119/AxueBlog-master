@@ -2,7 +2,7 @@
   <div class="blog-top">
     <div class = "index-header">
       <div class = "index-header-admin">
-        <span @click = "login">登录</span> / <span>注册</span>
+        <span @click = "login">登录</span> / <span @click = "register">注册</span>
       </div>
       <div class = "index-header-title">
         <h1>{{title}}</h1>
@@ -48,10 +48,10 @@ export default {
       title: 'Dummer ',
       describe: 'Where ever you go, what ever you do, I will be right here waiting for you ',
       guideItems: [
-        {item: 'HOME', type: 'home'},
-        {item: 'ARTICLES', type: 'articles'},
-        {item: 'PHOTOGRAPHS', type: 'photographs'},
-        {item: 'CONTACT', type: 'contact'}
+        {item: 'HOME', type: 'home', goPath: '/Axue-blog/home'},
+        {item: 'ARTICLES', type: 'articles', goPath: '/Axue-blog/articles'},
+        {item: 'PHOTOGRAPHS', type: 'photographs', goPath: '/Axue-blog/photographs'},
+        {item: 'CONTACT', type: 'contact', goPath: '/Axue-blog/contact'}
       ],
       guideType: 'home',
       img: {
@@ -77,7 +77,10 @@ export default {
   },
   methods: {
     login () { // 登录
-      this.$router.push('/admin');
+      this.$router.push('/Axue-blog/admin');
+    },
+    register () { // 注册
+      this.$router.push('/Axue-blog/register');
     },
     contactMe (val) { // 联系我的图层展示控制
       this.showMark = true;
@@ -99,7 +102,7 @@ export default {
     },
     selectGuide (val) {
       this.guideType = val.type;
-      this.$emit('selectType', val);
+      this.$router.push(val.goPath);
     }
   }
 }

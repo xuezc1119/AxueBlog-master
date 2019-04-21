@@ -8,7 +8,7 @@
 export default {
   name: 'App',
   created () {
-    this.$router.push('/Axue-blog');
+    this.$router.push('/Axue-blog/home');
   }
 }
 </script>
