@@ -43,16 +43,16 @@ export default new Router({
             {
               path: '/Axue-blog/contact',
               component: Contact
-            },
-            {
-              path: '/Axue-blog/login',
-              component: Login
-            },
-            {
-              path: '/Axue-blog/register',
-              component: Register
             }
           ]
+        },
+        {
+          path: '/Axue-blog/login',
+          component: Login
+        },
+        {
+          path: '/Axue-blog/register',
+          component: Register
         }
       ]
     },

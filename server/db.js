@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   username: {type: String}, // 用户账户
   userpwd: {type: String}, // 用户密码
   usertype: {type: String}, // 管理者1，游客2
-  usertype: {type: String}, // 登陆时间
+  userdate: {type: String}, // 登陆时间
 });
 
 // 定义一个文章表

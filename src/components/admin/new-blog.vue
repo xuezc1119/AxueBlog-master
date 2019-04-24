@@ -86,19 +86,19 @@ export default {
     },
     async addArticle () { // 添加文章
       if (this.articleTitle === '') {
-        this.$Message.info('请填写标题！');
+        this.$Message.warning('请填写标题！');
         return;
       }
       if (this.articleAbstract === '') {
-        this.$Message.info('请填写摘要！');
+        this.$Message.warning('请填写摘要！');
         return;
       }
       if (this.articleContent === '') {
-        this.$Message.info('请填写内容');
+        this.$Message.warning('请填写内容');
         return;
       }
       if (this.articleImgUrl === '') {
-        this.$Message.info('请填写图片地址');
+        this.$Message.warning('请填写图片地址');
         return;
       }
       await this.contentDataBase();
@@ -110,28 +110,28 @@ export default {
           this.articleContent = '';
           this.articleImgUrl = '';
         } else {
-          this.$Message.info('添加失败！');
+          this.$Message.error('添加失败！');
         }
       }).catch(err => {
         console.log(`写入文章catch：${err}`);
-        this.$Message.info(`添加失败！${err}`);
+        this.$Message.error(`添加失败！${err}`);
       });
     },
     async updateArticle () { // 更新文章
       if (this.articleTitle === '') {
-        this.$Message.info('请填写标题！');
+        this.$Message.warning('请填写标题！');
         return;
       }
       if (this.articleAbstract === '') {
-        this.$Message.info('请填写摘要！');
+        this.$Message.warning('请填写摘要！');
         return;
       }
       if (this.articleContent === '') {
-        this.$Message.info('请填写内容');
+        this.$Message.warning('请填写内容');
         return;
       }
       if (this.articleImgUrl === '') {
-        this.$Message.info('请填写图片地址');
+        this.$Message.warning('请填写图片地址');
         return;
       }
       await this.contentDataBase();
@@ -140,10 +140,10 @@ export default {
           this.$Message.info('更新成功！');
           this.$emit('blogBack', 1);
         } else {
-          this.$Message.info('更新失败！');
+          this.$Message.error('更新失败！');
         }
       }).catch(err => {
-        this.$Message.info('更新失败！');
+        this.$Message.error('更新失败！');
         console.log(`更新文章catch：${err}`);
       });
     },

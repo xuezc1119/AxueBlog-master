@@ -6,8 +6,30 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 // 注册
-router.get('/api/admin/signUp', (req, res) => {
-  res.send('访问注册接口');
+router.post('/api/admin/register', (req, res) => {
+  db.User.find({username: req.body.username}, (err, data) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    if (data.length > 0) {
+      res.send({'status': 0, 'message': '用户名已注册！'});
+    } else {
+      let newUser = new db.User({
+        username: req.body.username,
+        userpwd: req.body.userpwd,
+        usertype: req.body.usertype,
+        userdate: req.body.userdate
+      });
+      newUser.save((err) => {
+        if (err) {
+          res.send(err);
+        } else {
+          res.send({'status': 1, 'message': '注册成功！'});
+        }
+      });
+    }
+  });
 })
 
 // 新增文章
@@ -23,7 +45,7 @@ router.post('/api/admin/saveArticle', (req, res) => {
     if (err) {
       res.send(err);
     } else {
-      res.send({'status': 1});
+      res.send({'status': 1, 'message': '新建文章成功！'});
     }
   });
 })
@@ -46,7 +68,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
       if (err) {
         res.send(err);
       } else {
-        res.send({'status': 1});
+        res.send({'status': 1, 'message': '更新文章成功！'});
       }
     });
   })
@@ -70,7 +92,7 @@ router.post('/api/admin/deleteArticle', (req, res) => {
       res.send(err);
       return;
     }
-    res.send({'status': 1});
+    res.send({'status': 1, 'message': '删除成功！'});
   })
 })
 

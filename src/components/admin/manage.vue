@@ -74,12 +74,12 @@ export default {
         } else {
           this.delLoading = false;
           this.showTip = false;
-          this.$Message.info('删除失败！');
+          this.$Message.error('删除失败！');
         }
       }).catch(err => {
         this.delLoading = false;
         this.showTip = false;
-        this.$Message.info('删除失败！');
+        this.$Message.error('删除失败！');
         console.log(`删除文章catch：${err}`);
       });
     },
