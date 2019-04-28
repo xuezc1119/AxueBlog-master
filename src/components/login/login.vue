@@ -4,15 +4,15 @@
       <div class = "login-box-detail">
         <div class = "login-item">
           <span class = "item-span">账号：</span>
-          <input type = "text" placeholder = "请输入账号" ref = "number" @click = "selectInput(0)" />
+          <input type = "text" placeholder = "请输入账号" ref = "number" @click = "selectInput(0)" v-model = "number" />
         </div>
         <div class = "login-item">
           <span class = "item-span">密码：</span>
-          <input type = "password" placeholder = "请输入密码" ref = "pwd" @click = "selectInput(1)" />
+          <input type = "password" placeholder = "请输入密码" ref = "pwd" @click = "selectInput(1)" v-model = "pwd" />
         </div>
       </div>
       <div class = "login-btn">
-        <button>登录</button>
+        <button @click = "login">登录</button>
       </div>
       <div class = "login-tip">
         <span>还没账号？</span> <span class = "login-register" @click = "goRegister">注册</span>
@@ -23,6 +23,12 @@
 
 <script>
 export default {
+  data () {
+    return {
+      number: '',
+      pwd: ''
+    }
+  },
   methods: {
     selectInput (val) { // 选中input框时的样式
       switch (val) {
@@ -38,6 +44,44 @@ export default {
     },
     goRegister () {
       this.$router.push('/Axue-blog/register');
+    },
+    login () {
+      if (this.number === '') {
+        this.$Message.warning('请输入账号！');
+        return;
+      }
+      if (this.pwd === '') {
+        this.$Message.warning('请输入密码！');
+        return;
+      }
+      let loginInfo = {
+        username: this.number,
+        userpwd: this.pwd
+      };
+      this.$axios.post('/api/admin/login', loginInfo).then(res => {
+        console.log(res.data);
+        if (res.data.status === 1) {
+          this.$Message.info('登录成功！');
+          this.$store.commit('saveUserName', {
+            userName: res.data.userName,
+            userType: res.data.userType,
+            userToken: res.data.token
+          });
+          setTimeout(() => {
+            if (res.data.userType === '1') { // 管理者
+              this.$router.push('/Axue-blog/admin');
+            } else { // 游客
+              this.$router.push('/Axue-blog/home');
+            }
+          }, 1000);
+        } else if (res.data.status === 0) {
+          this.$Message.error('账号或密码错误，请重新登录！');
+          this.pwd = '';
+        }
+      }).catch(err => {
+        this.$Message.error('登录失败！');
+        console.log(`登录catch：${err}`);
+      });
     }
   }
 }

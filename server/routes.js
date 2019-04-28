@@ -32,6 +32,56 @@ router.post('/api/admin/register', (req, res) => {
   });
 })
 
+// 登录
+router.post('/api/admin/login', (req, res) => {
+  db.User.find({username: req.body.username, userpwd: req.body.userpwd}, (err, docs) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    if (docs.length > 0) {
+      let content = {username: req.body.username}; // 保证唯一性的，必须是对象
+      let secretOrPrivateKey = '555000'; // 密钥
+      let token = jwt.sign(content, secretOrPrivateKey, {
+        expiresIn: 60 * 60 * 24 // 过期时间
+      });
+      docs[0].token = token; // 校验时生成token
+      db.User(docs[0].save(err => {
+        if (err) {
+          res.send(err);
+          return;
+        }
+        res.send({'status': 1, 'message': '登录成功', 'token': docs[0].token, 'userName': docs[0]['username'], 'userType': docs[0].usertype});
+      }));
+    } else {
+      res.send({'status': 0, 'message': '登录失败'});
+    }
+  });
+})
+
+// 验证token
+router.post('/api/admin/checkUser', (req, res) => {
+  db.User.find({username: req.body.username, token: req.body.token}, (err, docs) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    if (docs.length > 0) {
+      let token = req.body.token;
+      let secretOrPrivateKey = '555000';
+      jwt.verify(token, secretOrPrivateKey, (err, data) => {
+        if (err) {
+          res.send({'status': 0, 'message': '身份已过期'});
+        } else {
+          res.send({'status': 1, 'username': docs[0]['username']});
+        }
+      });
+    } else {
+      res.send({'status': 0, 'message': '验证失败'});
+    }
+  });
+})
+
 // 新增文章
 router.post('/api/admin/saveArticle', (req, res) => {
   let articleInfo = {};

@@ -1,13 +1,21 @@
 <template>
   <div class="blog-top">
     <div class = "index-header">
-      <div class = "index-header-admin">
+      <div class = "index-header-admin" v-if = "this.$store.state.user.userInfo.userType === '0'">
         <span @click = "login">登录</span> / <span @click = "register">注册</span>
+      </div>
+      <!-- 用户登录 -->
+      <div class = "index-header-user" v-else>
+        <div class = "user-img" ref = "imgColor"></div>
+        <Icon type="ios-contact-outline" v-show = "this.$store.state.user.userInfo.userType === '2'" size = "24" color = "#C5C1AA" />
+        <Icon type="ios-sunny-outline" v-show = "this.$store.state.user.userInfo.userType === '1'" size = "24" color = "#C5C1AA" />
+        <Icon type="ios-arrow-down" size = "24" />
       </div>
       <div class = "index-header-title">
         <h1>{{title}}</h1>
         <p>{{describe}}</p>
       </div>
+      <!-- 导航栏 -->
       <div class = "index-header-guide">
         <div class = "index-header-guide-box">
           <div class = "guide-box-hide">
@@ -75,6 +83,14 @@ export default {
       ifShowList: false // 适配时是否展示导航列表
     }
   },
+  created () {
+    if (this.$store.state.user.userInfo.userType !== '0') { // 设置游客头像
+      this.$nextTick(() => {
+        let color = ['#FFDEAD', '#EEDC82','#FFFACD','#FFE4E1', '#EEE5DE'];
+        this.$refs.imgColor.style.backgroundColor = color[Math.floor(Math.random() * 4)];
+      });
+    }
+  },
   methods: {
     login () { // 登录
       this.$router.push('/Axue-blog/admin');
@@ -135,6 +151,27 @@ export default {
         cursor: pointer
       span:hover
         font-weight: bold
+    .index-header-user
+      position: absolute
+      width: 90px
+      height: 50px
+      background: #fff
+      border-radius: 4px
+      top: 10px
+      right: 10px
+      cursor: pointer
+      display: flex
+      align-items: center
+      justify-content: center
+      .user-img
+        width: 30px
+        height: 30px
+        border-radius: 50%
+        margin: 0 5px
+      .ivu-icon-ios-contact-outline, .ivu-icon-ios-sunny-outline
+        position: absolute
+        top: 13px
+        left: 21px
     .index-header-title
       height: 250px
       width: 100%
