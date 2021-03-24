@@ -13,9 +13,9 @@ var mutations = {
     state.userInfo.userName = data.userName;
     state.userInfo.userType = data.userType;
     state.userInfo.userToken = data.userToken;
-    window.localStorage.setItem('userName', state.userInfo.userName);
-    window.localStorage.setItem('userType', state.userInfo.userType);
-    window.localStorage.setItem('userToken', state.userInfo.userToken);
+    window.sessionStorage.setItem('userName', state.userInfo.userName);
+    window.sessionStorage.setItem('userType', state.userInfo.userType);
+    window.sessionStorage.setItem('token', state.userInfo.userToken);
     console.log(state.userInfo);
   }
 };

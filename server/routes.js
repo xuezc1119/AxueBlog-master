@@ -40,10 +40,10 @@ router.post('/api/admin/login', (req, res) => {
       return;
     }
     if (docs.length > 0) {
-      let content = {username: req.body.username}; // 保证唯一性的，必须是对象
+      let content = {username: req.body.username}; // 保证唯一性的，格式必须是对象
       let secretOrPrivateKey = '555000'; // 密钥
       let token = jwt.sign(content, secretOrPrivateKey, {
-        expiresIn: 60 * 60 * 24 // 过期时间
+        expiresIn: 60 * 60 * 24 // 过期时间（单位：秒）---24小时
       });
       docs[0].token = token; // 校验时生成token
       db.User(docs[0].save(err => {
@@ -68,7 +68,7 @@ router.post('/api/admin/checkUser', (req, res) => {
     }
     if (docs.length > 0) {
       let token = req.body.token;
-      let secretOrPrivateKey = '555000';
+      let secretOrPrivateKey = '555000'; // 加密密钥
       jwt.verify(token, secretOrPrivateKey, (err, data) => {
         if (err) {
           res.send({'status': 0, 'message': '身份已过期'});
@@ -78,6 +78,29 @@ router.post('/api/admin/checkUser', (req, res) => {
       });
     } else {
       res.send({'status': 0, 'message': '验证失败'});
+    }
+  });
+})
+
+// 退出
+router.post('/api/admin/signOut', (req, res) => {
+  db.User.find({username: req.body.username, token: req.body.token}, (err, docs) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    // console.log('查看',docs);
+    if (docs.length > 0) {
+      docs[0].token = '';
+      db.User(docs[0]).save(err => {
+        if (err) {
+          res.send(err);
+          return;
+        }
+        res.send({'status': 1, 'message': '退出成功！'});
+      });
+    } else {
+      res.send({'status': 0, 'message': '退出失败！'});
     }
   });
 })
@@ -125,13 +148,13 @@ router.post('/api/admin/updateArticle', (req, res) => {
 })
 
 // 获取所有文章列表
-router.post('/api/getArticleList', (req, res) => {
+router.post('/api/admin/getArticleList', (req, res) => {
   db.Article.find({}, (err, data) => {
     if (err) {
       res.send(err);
       return;
     }
-    res.send(data);
+    res.send({'status': 1, 'data': data});
   })
 })
 

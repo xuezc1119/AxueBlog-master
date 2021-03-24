@@ -28,7 +28,7 @@
 
 <script>
 import editBlog from './new-blog.vue';
-
+import { reqDeleteArticle, reqGetArticleList } from '@/api/api';
 export default {
   name: 'manage',
   data () {
@@ -65,7 +65,7 @@ export default {
       let articleInfo = {
         articleId: this.articleId
       };
-      this.$axios.post('/api/admin/deleteArticle', articleInfo).then(res => {
+      reqDeleteArticle(articleInfo).then(res => {
         if (res.data.status === 1) {
           this.delLoading = false;
           this.showTip = false;
@@ -94,9 +94,9 @@ export default {
       }
     },
     getArticleList () { // 获取文章列表
-      this.$axios.post('/api/getArticleList').then(res => {
-        console.log(res.data);
-        this.tableData = res.data;
+      reqGetArticleList().then(res => {
+        console.log(res.data.data);
+        this.tableData = res.data.data;
       }).catch(err => {
         console.log(`获取文章列表catch: ${err}`);
       });

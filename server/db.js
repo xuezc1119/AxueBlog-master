@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema({
   userpwd: {type: String}, // 用户密码
   usertype: {type: String}, // 管理者1，游客2
   userdate: {type: String}, // 登陆时间
+  token: {type: String}, // token
 });
 
 // 定义一个文章表

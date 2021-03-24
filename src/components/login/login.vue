@@ -22,7 +22,9 @@
 </template>
 
 <script>
+import { reqLogin } from '@/api/api';
 export default {
+  name: 'login',
   data () {
     return {
       number: '',
@@ -58,10 +60,11 @@ export default {
         username: this.number,
         userpwd: this.pwd
       };
-      this.$axios.post('/api/admin/login', loginInfo).then(res => {
+      // 目前数据库中有两个账号： aaa:aaa    123:aaa
+      reqLogin(loginInfo).then(res => {
         console.log(res.data);
         if (res.data.status === 1) {
-          this.$Message.info('登录成功！');
+          this.$Message.success('登录成功！');
           this.$store.commit('saveUserName', {
             userName: res.data.userName,
             userType: res.data.userType,
@@ -74,12 +77,13 @@ export default {
               this.$router.push('/Axue-blog/home');
             }
           }, 1000);
+          console.log('login--', sessionStorage.getItem('token'));
         } else if (res.data.status === 0) {
           this.$Message.error('账号或密码错误，请重新登录！');
           this.pwd = '';
         }
       }).catch(err => {
-        this.$Message.error('登录失败！');
+        this.$Message.error('登录失败，系统异常！');
         console.log(`登录catch：${err}`);
       });
     }

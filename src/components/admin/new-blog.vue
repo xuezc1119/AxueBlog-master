@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { reqSaveArticle, reqUpdateArticle } from '@/api/api';
 export default {
   name: 'new-blog',
   props: {
@@ -102,7 +103,7 @@ export default {
         return;
       }
       await this.contentDataBase();
-      this.$axios.post('/api/admin/saveArticle', this.articleInfo).then(res => {
+      reqSaveArticle(this.articleInfo).then(res => {
         if (res.data.status === 1) {
           this.$Message.info('添加成功！');
           this.articleTitle = '';
@@ -135,7 +136,7 @@ export default {
         return;
       }
       await this.contentDataBase();
-      this.$axios.post('/api/admin/updateArticle', {articleDetails: this.articleInfo}).then(res => {
+      reqUpdateArticle({articleDetails: this.articleInfo}).then(res => {
         if (res.data.status === 1) {
           this.$Message.info('更新成功！');
           this.$emit('blogBack', 1);

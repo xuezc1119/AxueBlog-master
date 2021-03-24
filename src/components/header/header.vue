@@ -1,15 +1,21 @@
 <template>
   <div class="blog-top">
     <div class = "index-header">
-      <div class = "index-header-admin" v-if = "this.$store.state.user.userInfo.userType === '0'">
+      <div class = "index-header-admin" v-if = "userType === '0'">
         <span @click = "login">登录</span> / <span @click = "register">注册</span>
       </div>
       <!-- 用户登录 -->
-      <div class = "index-header-user" v-else>
+      <div class = "index-header-user" v-else @click = "detailsControl">
+        <!-- 随机生成用户头像 -->
         <div class = "user-img" ref = "imgColor"></div>
-        <Icon type="ios-contact-outline" v-show = "this.$store.state.user.userInfo.userType === '2'" size = "24" color = "#C5C1AA" />
-        <Icon type="ios-sunny-outline" v-show = "this.$store.state.user.userInfo.userType === '1'" size = "24" color = "#C5C1AA" />
+        <Icon type="ios-contact-outline" v-show = "userType === '2'" size = "24" color = "#C5C1AA" />
+        <Icon type="ios-sunny-outline" v-show = "userType === '1'" size = "24" color = "#C5C1AA" />
         <Icon type="ios-arrow-down" size = "24" />
+        <div class = "user-three" v-show = "showDetails"></div><!-- 三角形 -->
+        <div class = "user-details" v-show = "showDetails" ref = "userDetails">
+          <div class = "user-name">{{userName}}</div>
+          <div @click = "signOut">退出</div>
+        </div>
       </div>
       <div class = "index-header-title">
         <h1>{{title}}</h1>
@@ -28,7 +34,7 @@
           <div class = "guide-box-right">
             <img v-for = "(item, index) in img" :key = "index" :src = "item" @click = "contactMe(index)">
             <div class = "right-search">
-              <input type = "input" placeholder = "search and hit here..." />
+              <input type = "input" placeholder = "search and hit here..." v-model="inputTxt" />
               <img :src = "searchImg">
             </div>
           </div>
@@ -49,10 +55,12 @@
 </template>
 
 <script>
+import { reqSignOut } from '@/api/api';
 export default {
   name: 'top',
   data () {
     return {
+      inputTxt: 'aaa',
       title: 'Dummer ',
       describe: 'Where ever you go, what ever you do, I will be right here waiting for you ',
       guideItems: [
@@ -80,20 +88,35 @@ export default {
       contactContent: '', // 选择哪种联系方式
       email: '1838037939@qq.com',
       phone: '18443996218',
-      ifShowList: false // 适配时是否展示导航列表
+      ifShowList: false, // 适配时是否展示导航列表
+      showDetails: false // 是否展示用户详细信息
     }
   },
   created () {
-    if (this.$store.state.user.userInfo.userType !== '0') { // 设置游客头像
+    if (this.userType !== '0') { // 设置游客头像
       this.$nextTick(() => {
-        let color = ['#FFDEAD', '#EEDC82','#FFFACD','#FFE4E1', '#EEE5DE'];
+        console.log(this.$refs.imgColor);
+        let color = ['#FFDEAD', '#D4D4D4','#FFFACD','#FFE4E1', '#EEE5DE'];
         this.$refs.imgColor.style.backgroundColor = color[Math.floor(Math.random() * 4)];
       });
     }
   },
+  mounted () {
+    document.addEventListener('click', this.clickAnother, true);
+  },
+  watch: {
+    inputTxt: {
+      handler (val) {
+        console.log('input输入', val);
+      }
+    }
+  },
   methods: {
-    login () { // 登录
+    ceshi () {
       this.$router.push('/Axue-blog/admin');
+    },
+    login () { // 登录
+      this.$router.push('/Axue-blog/login');
     },
     register () { // 注册
       this.$router.push('/Axue-blog/register');
@@ -119,6 +142,63 @@ export default {
     selectGuide (val) {
       this.guideType = val.type;
       this.$router.push(val.goPath);
+    },
+    detailsControl () { // 用户详细信息控制
+      this.showDetails = !this.showDetails;
+    },
+    clickAnother (e) { // 点击其他地方，用户信息层消失
+      if (this.showDetails) {
+        if(!this.$refs.userDetails.contains(e.target)) {
+          this.showDetails = false;
+          e.stopImmediatePropagation();
+        }
+      }
+    },
+    signOut () {
+      this.$Modal.confirm({
+        title: '提示',
+        content: '确定退出吗？',
+        onOk: () => {
+          reqSignOut({
+            username: this.userName,
+            token: this.userToken
+          }).then(res => {
+            console.log(res.data);
+            if (res.data.status === 1) {
+              this.$Message.info('退出成功！');
+              this.$store.commit('saveUserName', {
+                userName: '',
+                userType: '0',
+                userToken: ''
+              });
+              sessionStorage.clear();
+              // location.reload();
+              this.$router.push({name: 'login'});
+            } else {
+              this.$Message.error('退出失败！');
+              sessionStorage.clear();
+            }
+          }).catch(err => {
+            console.log(`退出catch：${err}`);
+            this.$Message.error('退出失败，系统异常！');
+            sessionStorage.clear();
+          });
+        }
+      });
+    }
+  },
+  computed: {
+    userType () {
+      // 缓存里没有就取仓库值
+      return window.sessionStorage.getItem('userType') || this.$store.state.user.userInfo.userType;
+    },
+    userName () {
+      // 缓存里没有就取仓库值
+      return window.sessionStorage.getItem('userName') || this.$store.state.user.userInfo.userName;
+    },
+    userToken () {
+      // 缓存里没有就取仓库值
+      return window.sessionStorage.getItem('token') || this.$store.state.user.userInfo.userToken;
     }
   }
 }
@@ -172,6 +252,32 @@ export default {
         position: absolute
         top: 13px
         left: 21px
+      .user-details
+        position: absolute
+        top: 61px
+        right: 0
+        width: 120px
+        background: rgba(255, 165, 79, 0.8)
+        border-radius: 4px
+        padding: 0 5px
+        div
+          width: 100%
+          height: 40px
+          line-height: 40px
+        .user-name
+          border-bottom: 1px solid #FAEBD7
+        div:hover
+          background: rgba(255, 165, 79, 1)
+      .user-three
+        width: 0
+        height: 0
+        position: absolute
+        right: 20px
+        top: 60px
+        transform: rotate(-45deg)
+        border-width: 0 15px 15px 15px
+        border-style: solid
+        border-color: transparent rgba(255, 165, 79, 0.8) transparent transparent
     .index-header-title
       height: 250px
       width: 100%

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { reqRegister } from '@/api/api';
 export default {
   data () {
     return {
@@ -73,7 +74,7 @@ export default {
       if (this.number === 'Axue') { // 我就是管理员哈哈哈哈
         userInfo.usertype = '1';
       }
-      this.$axios.post('/api/admin/register', userInfo).then(res => {
+      reqRegister(userInfo).then(res => {
         if (res.data.status === 0) { // 用户名已注册
           this.$Message.warning('该账号已被注册！');
         } else if (res.data.status === 1) {
