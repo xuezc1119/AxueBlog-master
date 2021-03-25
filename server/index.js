@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 const app = express(); 
 
 // 此处使用有顺序问题，需要把全局判断放在最上面才可以
-app.use(function (req, res, next) {
+app.use(function (req, res, next) { 
   console.log('-----------------test--------', req.url);
   if (req.url !== '/api/admin/login' && req.url !== '/api/admin/register') {
     let token = req.headers.token;
