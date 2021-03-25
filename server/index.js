@@ -8,7 +8,7 @@ const api = require('./routes');
 const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 
-const app = express(); 
+const app = express();
 
 // 此处使用有顺序问题，需要把全局判断放在最上面才可以
 app.use(function (req, res, next) { 
