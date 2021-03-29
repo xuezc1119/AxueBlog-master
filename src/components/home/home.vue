@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class = "home-content-left">
-      <div class = "left-box" v-for = "(item, index) in contents" :key = "index">
+      <div class = "left-box" v-for = "(item, index) in contents" :key = "index" @click="showContentDetail(index)">
         <div class = "left-box-top">
           <span>{{item.title}}</span>
         </div>
@@ -14,15 +14,15 @@
         <div class = "left-box-bottom">
           <div class = "bottom-box">
             <img :src = "writeImg">
-            <span>{{item.time}}</span>
+            <span>{{item.date}}</span>
           </div>
           <div class = "bottom-box">
             <img :src = "readImg">
-            <span>{{item.isRead}}</span>
+            <span>3</span>
           </div>
           <div class = "bottom-box">
             <img :src = "likeImg">
-            <span>{{item.like}}</span>
+            <span>9</span>
           </div>
         </div>
         <img :src = "starImg" class = "left-box-img">
@@ -36,32 +36,49 @@
 
 <script>
 import homeRight from './right/home-right';
+import { reqGetArticleList } from '@/api/api';
 export default {
   name: 'home',
   data () {
     return {
       contents: [
-        {
-          title: 'I wanna be your Chaperone',
-          img: './static/img/content-img/color-ballon.jpeg',
-          time: '2019-3-30',
-          isRead: '3',
-          like: '9',
-          abstract: 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.'
-        },
-        {
-          title: 'the Only One Call Away',
-          img: './static/img/content-img/cat.jpeg',
-          time: '2019-3-29',
-          isRead: '5',
-          like: '5',
-          abstract: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries'
-        }
+        // {
+        //   title: 'I wanna be your Chaperone',
+        //   img: './static/img/content-img/color-ballon.jpeg',
+        //   date: '2019-3-30',
+        //   isRead: '3',
+        //   like: '9',
+        //   abstract: 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.'
+        // },
+        // {
+        //   title: 'the Only One Call Away',
+        //   img: './static/img/content-img/cat.jpeg',
+        //   date: '2019-3-29',
+        //   isRead: '5',
+        //   like: '5',
+        //   abstract: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries'
+        // }
       ],
       writeImg: './static/img/writer.png',
       readImg: './static/img/read.png',
       likeImg: './static/img/like.png',
       starImg: './static/img/star.png'
+    }
+  },
+  mounted () {
+    this.getArticleList();
+  },
+  methods: {
+    getArticleList () { // 获取文章列表
+      reqGetArticleList().then(res => {
+        console.log(res.data.data);
+        this.contents = res.data.data;
+      }).catch(err => {
+        console.log(`获取文章列表catch: ${err}`);
+      });
+    },
+    showContentDetail (index) {
+      
     }
   },
   components: {
@@ -168,6 +185,7 @@ export default {
             height: 26px
           span
             margin: 0 10%
+            white-space: nowrap
     .left-box:hover
       box-shadow: 6px 6px 20px 2px rgba(130, 130, 130, 0.6)
     @media only screen and (max-width: 878px)

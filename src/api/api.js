@@ -48,18 +48,18 @@ var resInterceptor = function (response) {
     return response
 }
 // 请求拦截
-instance.interceptors.request.use(function (config) {
-    let token = sessionStorage.getItem("token");
-    if (token && token.length) {
-        config.headers['token'] = sessionStorage.getItem("token");
-    }
-    reqInterceptor(config);
-    return config;
-})
-// 响应拦截
-instance.interceptors.response.use(function (response) {
-    return resInterceptor(response);
-})
+// instance.interceptors.request.use(function (config) {
+//     let token = sessionStorage.getItem("token");
+//     if (token && token.length) {
+//         config.headers['token'] = sessionStorage.getItem("token");
+//     }
+//     reqInterceptor(config);
+//     return config;
+// })
+// // 响应拦截
+// instance.interceptors.response.use(function (response) {
+//     return resInterceptor(response);
+// })
 
 // 注册
 export const reqRegister = (params) => { return instance.post(`/api/admin/register`, params).then(res => res).catch(err => err) }
@@ -76,3 +76,15 @@ export const reqUpdateArticle = (params) => { return instance.post(`/api/admin/u
 export const reqGetArticleList = (params) => { return instance.post(`/api/admin/getArticleList`, params).then(res => res).catch(err => err) }
 // 删除文章
 export const reqDeleteArticle = (params) => { return instance.post(`/api/admin/deleteArticle`, params).then(res => res).catch(err => err) }
+// 新增文章类别
+export const reqSaveCategory = (params) => { return instance.post(`/api/admin/saveArticleCategory`, params).then(res => res).catch(err => err) }
+// 更新文章类别
+export const reqUpdateCategory = (params) => { return instance.post(`/api/admin/updateArticleCategory`, params).then(res => res).catch(err => err) }
+// 获取文章类别列表
+export const reqGetCategoryList = (params) => { return instance.post(`/api/admin/getArticleCategoryList`, params).then(res => res).catch(err => err) }
+// 删除文章类别
+export const reqDeleteCategory = (params) => { return instance.post(`/api/admin/deleteArticleCategory`, params).then(res => res).catch(err => err) }
+// 根据文章id查找文章明细
+export const reqGetArticleDetails = (params) => { return instance.post(`/api/admin/getArticleDetails`, params).then(res => res).catch(err => err) }
+// 统计所有类别对应数据数量
+export const reqStatisticCategory = (params) => { return instance.post(`/api/admin/statisticCategory`, params).then(res => res).catch(err => err) }

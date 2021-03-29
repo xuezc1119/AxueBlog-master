@@ -1,11 +1,11 @@
 <template>
   <div class="manage">
-    <Table :columns = "tableTitle" :data = "tableData">
+    <Table :columns = "tableTitle" :data = "tableData" style="width:100%">
       <template slot-scope="{ row, index }" slot="action">
         <Button type = "primary" size = "small" style = "margin-right: 5px" @click = "selectItem('edit', tableData, index)">编辑</Button>
         <Button type = "error" size = "small" @click = "selectItem('del', tableData, index)">删除</Button>
       </template>
-    </Table>
+    </Table> 
     <Modal
       v-model = "showTip"
       :closable = "false"
@@ -41,6 +41,10 @@ export default {
         {
             title: '文章标题',
             key: 'title'
+        },
+        {
+            title: '所属类别',
+            key: 'category'
         },
         {
             title: '操作',
@@ -95,7 +99,7 @@ export default {
     },
     getArticleList () { // 获取文章列表
       reqGetArticleList().then(res => {
-        console.log(res.data.data);
+        console.log(res.data.data); 
         this.tableData = res.data.data;
       }).catch(err => {
         console.log(`获取文章列表catch: ${err}`);

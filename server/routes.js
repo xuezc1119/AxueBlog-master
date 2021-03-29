@@ -113,6 +113,7 @@ router.post('/api/admin/saveArticle', (req, res) => {
   articleInfo.content = req.body.content;
   articleInfo.img = req.body.img;
   articleInfo.date = req.body.date;
+  articleInfo.category = req.body.category;
   let newArticle = new db.Article(articleInfo);
   newArticle.save((err) => {
     if (err) {
@@ -137,6 +138,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
     docs[0].content = details.content;
     docs[0].img = details.img;
     docs[0].date = details.date;
+    docs[0].category = details.category;
     db.Article(docs[0]).save((err) => { // 将修改过的文章进行保存，替换原有的文章，也就是更新
       if (err) {
         res.send(err);
@@ -166,6 +168,84 @@ router.post('/api/admin/deleteArticle', (req, res) => {
       return;
     }
     res.send({'status': 1, 'message': '删除成功！'});
+  })
+})
+
+// 新增文章类别
+router.post('/api/admin/saveArticleCategory', (req, res) => {
+  let categoryInfo = {};
+  categoryInfo.name = req.body.name;
+  let newArticleCategory = new db.Category(categoryInfo);
+  newArticleCategory.save((err) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send({'status': 1, 'message': '新建类别成功！'});
+    }
+  });
+})
+
+// 更新文章类别
+router.post('/api/admin/updateArticleCategory', (req, res) => {
+  let details = req.body.categoryDetails;
+  db.Category.find({_id: details._id}, (err, docs) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    console.log(docs); // 这是根据_id查找到的数据，唯一的，是一个对象数组，数组长度为1
+    docs[0].name = details.name;
+    db.Category(docs[0]).save((err) => {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send({'status': 1, 'message': '更新类别成功！'});
+      }
+    });
+  })
+})
+
+// 获取所有文章类别列表
+router.post('/api/admin/getArticleCategoryList', (req, res) => {
+  db.Category.find({}, (err, data) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    res.send({'status': 1, 'data': data});
+  })
+})
+
+// 删除文章类别
+router.post('/api/admin/deleteArticleCategory', (req, res) => {
+  db.Category.remove({_id: req.body.categoryId}, (err) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    res.send({'status': 1, 'message': '删除成功！'});
+  })
+})
+
+// 根据文章id查找文章明细
+router.post('/api/admin/getArticleDetails', (req, res) => {
+  db.Article.find({'_id': req.body.id}, (err, data) => {
+    if (err) {
+      res.send(err);
+      return;
+    }
+    res.send({'status': 1, 'data': data});
+  })
+})
+
+// 统计所有类别对应数据数量
+router.post('/api/admin/statisticCategory', (req, res) => {
+  db.Article.aggregate([{$group : {_id : "$category", total : {$sum : 1}}}], (err,data)=>{
+    if (err) {
+      res.send(err);
+      return;
+    }
+    res.send({'status': 1, 'data': data});
   })
 })
 

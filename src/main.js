@@ -7,8 +7,8 @@ import store from './store';
 import moment from 'moment';
 // import vueResource from 'vue-resource';
 import axios from 'axios';
-import iView from 'iview';
-import 'iview/dist/styles/iview.css';
+import ViewUI from 'view-design';
+import 'view-design/dist/styles/iview.css';
 import VueQuillEditor from 'vue-quill-editor';
 import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
@@ -19,7 +19,7 @@ Vue.use(VueQuillEditor);
 // 时间格式化工具
 Vue.prototype.$moment = moment;
 Vue.prototype.$axios = axios;
-Vue.use(iView); // 后台管理使用了iView框架
+Vue.use(ViewUI); // 后台管理使用了iView框架
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

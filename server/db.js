@@ -23,10 +23,17 @@ const articleSchema = new mongoose.Schema({
   content: {type: String}, // 内容
   img: {type: String}, // 图片
   date: {type: String}, // 日期
+  category: {type: String}, // 类别
+});
+
+// 类别表
+const articleCateGory = new mongoose.Schema({
+  name: {type: String}, // 名称
 });
 
 const Models = {
   User: mongoose.model('User', UserSchema), // model是由schema生成的模型，可以对数据库的操作
-  Article: mongoose.model('Article', articleSchema) // 表名为articles，这是schema内部机制
+  Article: mongoose.model('Article', articleSchema), // 表名为articles，这是schema内部机制
+  Category: mongoose.model('Category', articleCateGory),
 }
 module.exports = Models;

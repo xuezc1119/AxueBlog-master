@@ -11,23 +11,23 @@ const jwt = require("jsonwebtoken");
 const app = express();
 
 // 此处使用有顺序问题，需要把这里的全局判断放在最上面才可以
-app.use(function (req, res, next) { 
-  console.log('-----------------test--------', req.url);
-  if (req.url !== '/api/admin/login' && req.url !== '/api/admin/register') {
-    let token = req.headers.token;
-    let secretOrPrivateKey = '555000'; // 加密密钥
-    jwt.verify(token, secretOrPrivateKey, (err, data) => {
-      if (err) {
-        console.log('过期');
-        res.send({'status': 0, 'message': '身份已过期'});
-      } else {
-        next();
-      }
-    });
-  } else {
-    next();
-  }
-});
+// app.use(function (req, res, next) { 
+//   console.log('-----------------test--------', req.url);
+//   if (req.url !== '/api/admin/login' && req.url !== '/api/admin/register') {
+//     let token = req.headers.token;
+//     let secretOrPrivateKey = '555000'; // 加密密钥
+//     jwt.verify(token, secretOrPrivateKey, (err, data) => {
+//       if (err) {
+//         console.log('过期');
+//         res.send({'status': 0, 'message': '身份已过期'});
+//       } else {
+//         next();
+//       }
+//     });
+//   } else {
+//     next();
+//   }
+// });
 // 跨域
 app.use(cors());
 app.use(bodyParser.json()); // 读取本地json

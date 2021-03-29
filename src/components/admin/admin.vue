@@ -2,9 +2,10 @@
   <div class="admin">
     <div class = "admin-left">
       <div class = "left-pic">
-        <Avatar :src = "myPic" class = "pic-img" />
+        <div class = "pic-img" :style="{'backgroundImage': 'url('+ myPic +')'}"></div>
+        <span class = "pic-txt">AXue</span>
       </div>
-      <Menu theme="dark" class = "left-menu" @on-select = "writeBlog">
+      <Menu theme="dark" active-name="manage-blog" :open-names="['manage']" class = "left-menu" @on-select = "changeMenu">
         <Submenu name="manage">
           <template slot="title">
             <Icon type="ios-paper" />
@@ -12,6 +13,7 @@
           </template>
           <MenuItem name="write-blog">写博客</MenuItem>
           <MenuItem name="manage-blog">博客文章管理</MenuItem>
+          <MenuItem name="manage-category">类别管理</MenuItem>
         </Submenu>
       </Menu>
     </div>
@@ -20,8 +22,9 @@
       <div class = "right-content">
         <div class = "content-box">
           <!-- 博客管理 -->
-          <new-blog v-if = "isNew"></new-blog>
-          <blog-manage v-else></blog-manage>
+          <new-blog v-if = "isNew==='write-blog'"></new-blog>
+          <blog-manage v-if = "isNew==='manage-blog'"></blog-manage>
+          <category-manage v-if = "isNew==='manage-category'"></category-manage>
         </div>
       </div>
     </div>
@@ -31,27 +34,25 @@
 <script>
 import newBlog from './new-blog';
 import blogManage from './manage';
+import categoryManage from './category';
 
 export default {
   name: 'admin',
   data () {
     return {
       myPic: './static/img/content-img/head.jpg',
-      isNew: false // 进入页面默认显示文章管理
+      isNew: 'manage-blog' // 进入页面默认显示文章管理
     }
   },
   methods: {
-    writeBlog (e) { // 切换写文章和文章管理
-      if (e === 'write-blog') {
-        this.isNew = true;
-      } else if (e === 'manage-blog') {
-        this.isNew = false;
-      }
+    changeMenu (e) { // 切换写文章和文章管理
+      this.isNew = e;
     }
   },
   components: {
     'new-blog': newBlog,
-    'blog-manage': blogManage
+    'blog-manage': blogManage,
+    'category-manage': categoryManage
   }
 }
 </script>
@@ -70,14 +71,20 @@ export default {
     background: rgb(41, 56, 70)
     .left-pic
       width: 100%
-      height: 150px
-      line-height: 150px
-      text-align: left
-      margin-left: 5%
+      height: 120px
+      display: flex;
+      align-items: center;
       .pic-img
         width: 80px
         height: 80px
         border-radius: 50%
+        background-size: cover
+        background-position: center
+        margin-left: 10%
+      .pic-txt
+        color: #fff
+        margin-left: 5%
+        font-size: 18px
     .left-menu
       width: 100% !important
   .admin-right

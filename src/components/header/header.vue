@@ -60,7 +60,7 @@ export default {
   name: 'top',
   data () {
     return {
-      inputTxt: 'aaa',
+      inputTxt: '',
       title: 'Dummer ',
       describe: 'Where ever you go, what ever you do, I will be right here waiting for you ',
       guideItems: [

@@ -9,6 +9,12 @@
         <span>摘要：</span>
         <textarea type = "text" placeholder="Please enter the abstract" v-model = "articleAbstract"></textarea>
       </div>
+      <div class = "content-abstract">
+        <span>分类：</span>
+        <Select v-model="category" style="width:70%" label-in-value @on-change="changeCategory">
+          <Option v-for="item in categoryList" :value="item._id" :key="item._id">{{ item.name }}</Option>
+        </Select>
+      </div>
       <div class = "content-detail">
         <span>文章内容：</span>
         <quill-editor v-model="articleContent"
@@ -20,7 +26,7 @@
       </div>
       <div class = "content-img">
         <span>上传图片：</span>
-        <!-- 实在是没研究明白file上传图片，所以只能暂时使用这种上传网络地址的方式，以后在研究吧 -->
+        <!-- 实在是没研究明白file上传图片，所以只能暂时使用这种上传网络地址的方式，以后在研究吧  -->
         <input type = "text" placeholder="Please enter the img url" v-model = "articleImgUrl">
       </div>
     </div>
@@ -35,7 +41,7 @@
 </template>
 
 <script>
-import { reqSaveArticle, reqUpdateArticle } from '@/api/api';
+import { reqSaveArticle, reqUpdateArticle, reqGetCategoryList } from '@/api/api';
 export default {
   name: 'new-blog',
   props: {
@@ -54,15 +60,20 @@ export default {
       articleTitle: '',
       articleAbstract: '',
       articleImgUrl: '',
-      articleInfo: {} // 存储文章内容
+      articleInfo: {}, // 存储文章内容
+      category: '',
+      categoryName: '',
+      categoryList: []
     }
   },
   created () {
+    this.reqGetList();
     if (this.way === '') return;
     this.articleContent = this.articleInfoDetails.content;
     this.articleTitle = this.articleInfoDetails.title;
     this.articleAbstract = this.articleInfoDetails.abstract;
     this.articleImgUrl = this.articleInfoDetails.img;
+    this.category = this.articleInfoDetails.category;
   },
   methods: {
     onEditorBlur(editor){//失去焦点事件 
@@ -72,10 +83,14 @@ export default {
     onEditorChange({editor,html,text}){//编辑器文本发生变化
     //this.content可以实时获取到当前编辑器内的文本内容
     },
+    changeCategory (val) {
+      this.categoryName = val.label;
+    },
     contentDataBase () {
       let articleDetails = {
         title: this.articleTitle,
         abstract: this.articleAbstract,
+        category: this.categoryName, // 存分类的名字
         content: this.articleContent.substring(3, this.articleContent.length - 4),
         img: this.articleImgUrl,
         date: this.$moment().format('YYYY-MM-DD')
@@ -94,6 +109,10 @@ export default {
         this.$Message.warning('请填写摘要！');
         return;
       }
+      if (this.category === '') {
+        this.$Message.warning('请选择分类！');
+        return;
+      }
       if (this.articleContent === '') {
         this.$Message.warning('请填写内容');
         return;
@@ -110,6 +129,7 @@ export default {
           this.articleAbstract = '';
           this.articleContent = '';
           this.articleImgUrl = '';
+          this.category = '';
         } else {
           this.$Message.error('添加失败！');
         }
@@ -125,6 +145,10 @@ export default {
       }
       if (this.articleAbstract === '') {
         this.$Message.warning('请填写摘要！');
+        return;
+      }
+      if (this.category === '') {
+        this.$Message.warning('请选择分类！');
         return;
       }
       if (this.articleContent === '') {
@@ -146,6 +170,14 @@ export default {
       }).catch(err => {
         this.$Message.error('更新失败！');
         console.log(`更新文章catch：${err}`);
+      });
+    },
+    reqGetList () { // 获取文章类别列表
+      this.categoryList = [];
+      reqGetCategoryList().then(res => {
+        this.categoryList = res.data.data;
+      }).catch(err => {
+        console.log(`获取文章列表catch: ${err}`);
       });
     },
     blogBack () { // 更新文章的返回
@@ -245,4 +277,6 @@ export default {
     top: 10px
     left: 10px
     cursor: pointer
+>>> .ivu-select-selected-value, >>> .ivu-select-placeholder
+  text-align: left
 </style>
