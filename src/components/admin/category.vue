@@ -13,6 +13,7 @@
         </div>
       </div>
     </div>
+    <div class="table-page"><Page :current="page.pageIndex" :total="page.totalCount" :page-size="page.pageSize" @on-change="changePage" /></div>
     <Modal v-model="showModal" :closable="false" :title="title">
       <div>
         <Input v-model="inputValue" placeholder="请输入类别名称" maxlength="10" show-word-limit />
@@ -35,6 +36,11 @@ export default {
       inputValue: '',
       editValue: '', // 编辑暂存
       showModal: false,
+      page: {
+        totalCount: 0,
+        pageIndex: 1,
+        pageSize: 20
+      },
       categoryList: []
     }
   },
@@ -43,11 +49,16 @@ export default {
   },
   methods: {
     reqGetList () { // 获取文章类别列表
-      reqGetCategoryList().then(res => {
+      let params = {
+        pageIndex: this.page.pageIndex,
+        pageSize: this.page.pageSize
+      };
+      reqGetCategoryList(params).then(res => {
         console.log(res.data.data);
         this.categoryList = res.data.data;
+        this.page.totalCount = res.data.total;
       }).catch(err => {
-        console.log(`获取文章列表catch: ${err}`);
+        console.log(`获取文章类别列表catch: ${err}`);
       });
     },
     addCategory () {
@@ -111,6 +122,10 @@ export default {
         }
       });
     },
+    changePage (page) {
+      this.page.pageIndex = page;
+      this.reqGetList();
+    },
     getRandomColor () { // 生成随机颜色-浅色
       return '#' +
         (function rand(color) {
@@ -127,13 +142,18 @@ export default {
 .category
   width: 100%
   height: 100%
+  position: relative
   .add 
     padding: 15px 15px 0 0;
     text-align: right;
+  .table-page
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 40px;
   .list
     display: flex;
     flex-wrap: wrap;
-    overflow-y: auto;
     .item
       width: calc(20% - 20px);
       height: 100px;

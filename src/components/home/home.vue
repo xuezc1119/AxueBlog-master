@@ -27,6 +27,7 @@
         </div>
         <img :src = "starImg" class = "left-box-img">
       </div>
+      <div class="table-page"><Page :current="page.pageIndex" :total="page.totalCount" :page-size="page.pageSize" @on-change="changePage" /></div>
     </div>
     <div class = "home-content-right">
       <home-right></home-right>
@@ -62,7 +63,12 @@ export default {
       writeImg: './static/img/writer.png',
       readImg: './static/img/read.png',
       likeImg: './static/img/like.png',
-      starImg: './static/img/star.png'
+      starImg: './static/img/star.png',
+      page: {
+        totalCount: 0,
+        pageIndex: 1,
+        pageSize: 5
+      },
     }
   },
   mounted () {
@@ -70,15 +76,38 @@ export default {
   },
   methods: {
     getArticleList () { // 获取文章列表
-      reqGetArticleList().then(res => {
+      let params = {
+        search: this.search,
+        pageIndex: this.page.pageIndex,
+        pageSize: this.page.pageSize
+      };
+      reqGetArticleList(params).then(res => {
         console.log(res.data.data);
         this.contents = res.data.data;
+        this.page.totalCount = res.data.total;
       }).catch(err => {
         console.log(`获取文章列表catch: ${err}`);
       });
     },
+    changePage (page) {
+      this.page.pageIndex = page;
+      this.getArticleList();
+    },
     showContentDetail (index) {
       
+    }
+  },
+  watch: {
+    search: {
+      handler (val) {
+        console.log('test',val);
+        this.getArticleList();
+      }
+    }
+  },
+  computed: {
+    search () {
+      return this.$store.state.common.searchValue;
     }
   },
   components: {
@@ -100,6 +129,8 @@ export default {
     flex-direction: column
     align-items: center
     justify-content: space-between
+    .table-page
+      margin: 20px 0
     .left-box
       width: 100%
       margin: 20px 0

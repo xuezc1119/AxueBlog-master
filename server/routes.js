@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+const { count } = require('console');
 
 // 注册
 router.post('/api/admin/register', (req, res) => {
@@ -114,6 +115,7 @@ router.post('/api/admin/saveArticle', (req, res) => {
   articleInfo.img = req.body.img;
   articleInfo.date = req.body.date;
   articleInfo.category = req.body.category;
+  articleInfo.categoryId = req.body.categoryId;
   let newArticle = new db.Article(articleInfo);
   newArticle.save((err) => {
     if (err) {
@@ -139,6 +141,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
     docs[0].img = details.img;
     docs[0].date = details.date;
     docs[0].category = details.category;
+    docs[0].categoryId = details.categoryId;
     db.Article(docs[0]).save((err) => { // 将修改过的文章进行保存，替换原有的文章，也就是更新
       if (err) {
         res.send(err);
@@ -150,14 +153,75 @@ router.post('/api/admin/updateArticle', (req, res) => {
 })
 
 // 获取所有文章列表
+// -------------------------这个方法有一个问题-不能获取到模糊查询后的数据总数--所以改用下面的方式-------------------
+// router.post('/api/admin/getArticleList', (req, res) => {
+//   db.Article.estimatedDocumentCount({}, (err, count)=> { // estimatedDocumentCount-获取总数
+//     let index = req.body.pageIndex ? ((req.body.pageIndex-1)*req.body.pageSize) : 0;
+//     let size = req.body.pageSize ? req.body.pageSize : count; // 没有传参时直接获取全部数据
+//     let search = req.body.search ? req.body.search : '';
+//     // $regex可以实现模糊查询
+//     // 对应mongodb中，可以直接使用 ‘/../’ 斜杠。但是在nodejs中，必须要使用RegExp，来构建正则表达式对象
+//     var str = ".*" + search + ".*$";
+//     var reg = new RegExp(str);
+//     var _filter = {
+//       $or: [ // 多条件模糊查询
+//         {"title": {$regex: reg, $options: 'i'}},
+//         {"abstract": {$regex: reg, $options: 'i'}},
+//       ]
+//     };
+//     // db.Article.find({"title": {$regex: reg, $options: 'i'}}, (err, data) => { // $options: 'i'忽略大小写
+//     db.Article.find(_filter, (err, data) => { // 多条件查询 
+//       if (err) {
+//         res.send(err);
+//         return;
+//       }
+//       res.send({'status': 1, 'data': data, 'total': count});
+//     }).skip(index).limit(size)
+//   });
+// })
+
 router.post('/api/admin/getArticleList', (req, res) => {
-  db.Article.find({}, (err, data) => {
-    if (err) {
-      res.send(err);
-      return;
-    }
-    res.send({'status': 1, 'data': data});
-  })
+    let index = req.body.pageIndex ? ((req.body.pageIndex-1)*req.body.pageSize) : 0;
+    let size = req.body.pageSize ? req.body.pageSize : 10; // 每页几条
+    let search = req.body.search ? req.body.search : ''; // 搜索关键字
+    let count = 0; // 总数
+    // $regex可以实现模糊查询
+    // 对应mongodb中，可以直接使用 ‘/../’ 斜杠。但是在nodejs中，必须要使用RegExp，来构建正则表达式对象
+    var str = ".*" + search + ".*$";
+    var reg = new RegExp(str);
+    var _filter = {
+      $or: [ // 多条件模糊查询
+        {"title": {$regex: reg, $options: 'i'}},
+        {"abstract": {$regex: reg, $options: 'i'}},
+      ]
+    };
+    var p1 = new Promise((resolve, reject)=> {
+      db.Article.find(_filter).count((err,con)=>{ // 获取总数
+        if (err) {
+          res.send(err);
+          reject(err);
+          return;
+        }
+        resolve(con);
+      });
+    });
+    var p2 = new Promise((resolve, reject)=>{
+      // db.Article.find({"title": {$regex: reg, $options: 'i'}}, (err, data) => { // $options: 'i'忽略大小写
+      db.Article.find(_filter, (err, data) => { // 多条件查询 
+        if (err) {
+          res.send(err);
+          reject(err);
+          return;
+        }
+        resolve(data);
+      }).skip(index).limit(size)
+    });
+    Promise.all([p1, p2]).then(val => {
+      console.log(val)
+      count = (val[0] && val[0]>=0) ? val[0] : 0;
+      res.send({'status': 1, 'data': val[1], 'total': count});
+    });
+    
 })
 
 // 删除文章
@@ -199,20 +263,43 @@ router.post('/api/admin/updateArticleCategory', (req, res) => {
       if (err) {
         res.send(err);
       } else {
-        res.send({'status': 1, 'message': '更新类别成功！'});
+        db.Article.update({'categoryId': details._id}, {$set: {'category': details.name}}, {multi:true}, (error, result)=> {
+          res.send({'status': 1, 'message': '更新类别成功！'});
+        });
+        // 上面使用了update()方法，
+        // param1:{查询条件}   param2{更新的数据}   param3{upsert:如果不存在是否插入, multi:更新第一条还是全部}
+        // 使用save()也可以
+        // db.Article.find({categoryId: details._id}, (error, doc) => {
+        //   if (error) {
+        //     res.send(error);
+        //     return;
+        //   }
+        //   if (doc && doc.length > 0) {
+        //     doc.forEach(item => {
+        //       item.category = details.name;
+        //       db.Article(item).save();
+        //     })
+        //   }
+        //   res.send({'status': 1, 'message': '更新类别成功！'});
+        // })
       }
     });
   })
+  
 })
 
 // 获取所有文章类别列表
 router.post('/api/admin/getArticleCategoryList', (req, res) => {
-  db.Category.find({}, (err, data) => {
-    if (err) {
-      res.send(err);
-      return;
-    }
-    res.send({'status': 1, 'data': data});
+  let index = req.body.pageIndex ? ((req.body.pageIndex-1)*req.body.pageSize) : 0;
+  let size = req.body.pageSize ? req.body.pageSize : 20;
+  db.Category.estimatedDocumentCount({}, (err, count) => {
+    db.Category.find({}, (err, data) => {
+      if (err) {
+        res.send(err);
+        return;
+      }
+      res.send({'status': 1, 'data': data, 'total': count});
+    }).skip(index).limit(size)
   })
 })
 

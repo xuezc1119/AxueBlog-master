@@ -34,8 +34,7 @@
           <div class = "guide-box-right">
             <img v-for = "(item, index) in img" :key = "index" :src = "item" @click = "contactMe(index)">
             <div class = "right-search">
-              <input type = "input" placeholder = "search and hit here..." v-model="inputTxt" />
-              <img :src = "searchImg">
+              <Input search placeholder="search and hit here..." v-model="inputTxt" @on-search="searchAction" />
             </div>
           </div>
         </div>
@@ -104,13 +103,6 @@ export default {
   mounted () {
     document.addEventListener('click', this.clickAnother, true);
   },
-  watch: {
-    inputTxt: {
-      handler (val) {
-        console.log('input输入', val);
-      }
-    }
-  },
   methods: {
     ceshi () {
       this.$router.push('/Axue-blog/admin');
@@ -142,6 +134,9 @@ export default {
     selectGuide (val) {
       this.guideType = val.type;
       this.$router.push(val.goPath);
+    },
+    searchAction (val) {
+      this.$store.commit('changeSearch', val); // 将搜索值存储，方便其他组件使用
     },
     detailsControl () { // 用户详细信息控制
       this.showDetails = !this.showDetails;
@@ -357,8 +352,7 @@ export default {
           z-index: 100
           background: rgba(249, 238, 201, 0.8)
         .guide-box-right
-          width: 20%
-          // background: pink
+          width: 25%
           margin: 0 0 0 2%
           display: flex
           align-items: center
@@ -373,17 +367,6 @@ export default {
           .right-search
             position: relative
             margin: 0 0 0 20px
-            input
-              height: 40px
-              padding: 0 20px 0 5px
-              outline: medium
-              color: #2c3e50
-              border: 1px solid rgb(210,210,210)
-              overflow: hidden
-              text-overflow: ellipsis
-              white-space: nowrap
-            input::placeholder
-              color: rgb(190, 190, 190)
             img
               position: absolute
               right: 5px
@@ -409,21 +392,16 @@ export default {
       text-align: center
       border: 1px solid rgb(210,210,210)
       background: rgb(140, 140, 140)
-      input
+      .input-search
         border: 0
         outline: none
         background: rgb(140, 140, 140)
-        color: #2c3e50
+        color: #fff
         font-size: 20px
         text-align: center
         height: 30px
         line-height: 30px
         text-decoration: none
-      input::selection
-        text-decoration: none
-        border: 0
-        outline: none
-        background: rgb(240,240,240)
     button
       width: 150px
       height: 70px

@@ -11,7 +11,7 @@
       </div>
       <div class = "content-abstract">
         <span>分类：</span>
-        <Select v-model="category" style="width:70%" label-in-value @on-change="changeCategory">
+        <Select v-model="categoryId" style="width:70%" label-in-value @on-change="changeCategory">
           <Option v-for="item in categoryList" :value="item._id" :key="item._id">{{ item.name }}</Option>
         </Select>
       </div>
@@ -61,7 +61,7 @@ export default {
       articleAbstract: '',
       articleImgUrl: '',
       articleInfo: {}, // 存储文章内容
-      category: '',
+      categoryId: '',
       categoryName: '',
       categoryList: []
     }
@@ -73,7 +73,8 @@ export default {
     this.articleTitle = this.articleInfoDetails.title;
     this.articleAbstract = this.articleInfoDetails.abstract;
     this.articleImgUrl = this.articleInfoDetails.img;
-    this.category = this.articleInfoDetails.category;
+    this.categoryId = this.articleInfoDetails.categoryId;
+    this.categoryName = this.articleInfoDetails.category;
   },
   methods: {
     onEditorBlur(editor){//失去焦点事件 
@@ -90,7 +91,8 @@ export default {
       let articleDetails = {
         title: this.articleTitle,
         abstract: this.articleAbstract,
-        category: this.categoryName, // 存分类的名字
+        category: this.categoryName, // 存分类的名字 
+        categoryId: this.categoryId, // 存分类的id 
         content: this.articleContent.substring(3, this.articleContent.length - 4),
         img: this.articleImgUrl,
         date: this.$moment().format('YYYY-MM-DD')
@@ -109,7 +111,7 @@ export default {
         this.$Message.warning('请填写摘要！');
         return;
       }
-      if (this.category === '') {
+      if (this.categoryId === '') {
         this.$Message.warning('请选择分类！');
         return;
       }
@@ -129,7 +131,7 @@ export default {
           this.articleAbstract = '';
           this.articleContent = '';
           this.articleImgUrl = '';
-          this.category = '';
+          this.categoryId = '';
         } else {
           this.$Message.error('添加失败！');
         }
@@ -147,7 +149,7 @@ export default {
         this.$Message.warning('请填写摘要！');
         return;
       }
-      if (this.category === '') {
+      if (this.categoryId === '') {
         this.$Message.warning('请选择分类！');
         return;
       }

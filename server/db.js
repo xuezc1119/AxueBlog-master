@@ -24,6 +24,7 @@ const articleSchema = new mongoose.Schema({
   img: {type: String}, // 图片
   date: {type: String}, // 日期
   category: {type: String}, // 类别
+  categoryId: {type: String}, // 类别id
 });
 
 // 类别表

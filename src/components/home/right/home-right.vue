@@ -108,7 +108,7 @@ export default {
     box-shadow: none !important
   .right-mine
     width: 100%
-    margin: 25px 0 5% 0
+    margin: 20px 0 5% 0
     padding: 5%
     display: flex
     flex-direction: column

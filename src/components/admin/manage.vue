@@ -1,11 +1,12 @@
 <template>
   <div class="manage">
-    <Table :columns = "tableTitle" :data = "tableData" style="width:100%">
+    <Table :columns = "tableTitle" :data = "tableData" style="width:100%" class="table-box">
       <template slot-scope="{ row, index }" slot="action">
         <Button type = "primary" size = "small" style = "margin-right: 5px" @click = "selectItem('edit', tableData, index)">编辑</Button>
         <Button type = "error" size = "small" @click = "selectItem('del', tableData, index)">删除</Button>
       </template>
     </Table> 
+    <div class="table-page"><Page :current="page.pageIndex" :total="page.totalCount" :page-size="page.pageSize" @on-change="changePage" /></div>
     <Modal
       v-model = "showTip"
       :closable = "false"
@@ -53,6 +54,11 @@ export default {
         }
       ],
       tableData: [],
+      page: {
+        totalCount: 0,
+        pageIndex: 1,
+        pageSize: 10
+      },
       showTip: false,
       delLoading: false,
       articleId: '', // 选择要删除的文章id
@@ -98,12 +104,21 @@ export default {
       }
     },
     getArticleList () { // 获取文章列表
-      reqGetArticleList().then(res => {
+      let params = {
+        pageIndex: this.page.pageIndex,
+        pageSize: this.page.pageSize
+      };
+      reqGetArticleList(params).then(res => {
         console.log(res.data.data); 
         this.tableData = res.data.data;
+        this.page.totalCount = res.data.total;
       }).catch(err => {
         console.log(`获取文章列表catch: ${err}`);
       });
+    },
+    changePage (page) {
+      this.page.pageIndex = page;
+      this.getArticleList();
     },
     backUpdate (val) {
       this.showDetails = false;
@@ -124,7 +139,7 @@ export default {
   width: 100%
   height: 100%
   display: flex
-  justify-content: center
+  flex-direction: column
   position: relative
   .manage-edit
     position: absolute
@@ -134,4 +149,8 @@ export default {
     width: 100%
     height: 100%
     z-index: 50
+  .table-page
+    margin-top: 20px
+  .table-box
+    height: 520px
 </style>
