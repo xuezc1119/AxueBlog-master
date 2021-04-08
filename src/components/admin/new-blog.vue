@@ -17,12 +17,10 @@
       </div>
       <div class = "content-detail">
         <span>文章内容：</span>
-        <quill-editor v-model="articleContent"
-          @blur="onEditorBlur($event)"
-          @focus="onEditorFocus($event)"
-          @change="onEditorChange($event)">
-        </quill-editor>
-        <!-- <textarea type = "text" placeholder="请输入文章内容"></textarea> -->
+        <!-- 暂时不要上传图片，图片过大会引起系统错误，后面优化时在参考其他做修改 -->
+        <div class="detail-mavon">
+          <mavon-editor v-model="articleContent" @change="onEditorChange"/>
+        </div>
       </div>
       <div class = "content-img">
         <span>上传图片：</span>
@@ -77,12 +75,9 @@ export default {
     this.categoryName = this.articleInfoDetails.category;
   },
   methods: {
-    onEditorBlur(editor){//失去焦点事件 
-    },
-    onEditorFocus(editor){//获得焦点事件
-    },
-    onEditorChange({editor,html,text}){//编辑器文本发生变化
-    //this.content可以实时获取到当前编辑器内的文本内容
+    onEditorChange(value, render){//编辑器文本发生变化
+      // console.log(value, render);
+      console.log(this.articleContent);
     },
     changeCategory (val) {
       this.categoryName = val.label;
@@ -93,7 +88,7 @@ export default {
         abstract: this.articleAbstract,
         category: this.categoryName, // 存分类的名字 
         categoryId: this.categoryId, // 存分类的id 
-        content: this.articleContent.substring(3, this.articleContent.length - 4),
+        content: this.articleContent,
         img: this.articleImgUrl,
         date: this.$moment().format('YYYY-MM-DD')
       }
@@ -264,14 +259,10 @@ export default {
         line-height: 30px
         text-align: right
         margin: 0 2% 0 0
-      .quill-editor
+      .detail-mavon
         width: 70%
-        text-align: left
-        >>> .ql-toolbar
-          height: 20%
-          padding: 3px
-        >>> .ql-container
-          height: 80%
+        >>> .v-note-wrapper
+          height: 95%
   .blog-add
     width: 100%
   .blog-back

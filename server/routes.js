@@ -154,6 +154,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
 
 // 获取所有文章列表
 // -------------------------这个方法有一个问题-不能获取到模糊查询后的数据总数--所以改用下面的方式-------------------
+// -------------------------进行模糊查询同时进行分页，获取的总数是分页的总数，所以方法弃用-------------------------
 // router.post('/api/admin/getArticleList', (req, res) => {
 //   db.Article.estimatedDocumentCount({}, (err, count)=> { // estimatedDocumentCount-获取总数
 //     let index = req.body.pageIndex ? ((req.body.pageIndex-1)*req.body.pageSize) : 0;
@@ -180,6 +181,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
 //   });
 // })
 
+// 获取所有文章列表
 router.post('/api/admin/getArticleList', (req, res) => {
     let index = req.body.pageIndex ? ((req.body.pageIndex-1)*req.body.pageSize) : 0;
     let size = req.body.pageSize ? req.body.pageSize : 10; // 每页几条
@@ -191,7 +193,7 @@ router.post('/api/admin/getArticleList', (req, res) => {
     var reg = new RegExp(str);
     var _filter = {
       $or: [ // 多条件模糊查询
-        {"title": {$regex: reg, $options: 'i'}},
+        {"title": {$regex: reg, $options: 'i'}}, // $options: 'i'忽略大小写
         {"abstract": {$regex: reg, $options: 'i'}},
       ]
     };
@@ -321,7 +323,7 @@ router.post('/api/admin/getArticleDetails', (req, res) => {
       res.send(err);
       return;
     }
-    res.send({'status': 1, 'data': data});
+    res.send({'status': 1, 'data': data[0]});
   })
 })
 

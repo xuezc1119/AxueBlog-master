@@ -9,12 +9,10 @@ import moment from 'moment';
 import axios from 'axios';
 import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';
-import VueQuillEditor from 'vue-quill-editor';
-import 'quill/dist/quill.core.css';
-import 'quill/dist/quill.snow.css';
-import 'quill/dist/quill.bubble.css';
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 
-Vue.use(VueQuillEditor);
+Vue.use(mavonEditor);
 // Vue.use(vueResource);
 // 时间格式化工具
 Vue.prototype.$moment = moment;

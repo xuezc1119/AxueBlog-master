@@ -30,7 +30,8 @@ const app = express();
 // });
 // 跨域
 app.use(cors());
-app.use(bodyParser.json()); // 读取本地json
+app.use(bodyParser.json({limit:'2mb'})); // 读取本地json
+app.use(bodyParser.urlencoded({ limit:'2mb', extended: true }));
 app.use(api);
 app.use(cookieParser());
 

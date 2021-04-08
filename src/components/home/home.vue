@@ -94,7 +94,8 @@ export default {
       this.getArticleList();
     },
     showContentDetail (index) {
-      
+      console.log(this.contents[index]._id);
+      this.$router.push({name: 'articleDetails', params: {id: this.contents[index]._id}});
     }
   },
   watch: {

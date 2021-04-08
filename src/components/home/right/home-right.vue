@@ -23,7 +23,7 @@
       </div>
       <div class = "right-mine-center">
         <div class = "img-box">
-          <img :src = "myContent.myImg">
+          <div class="img-bg" :style="{'backgroundImage': 'url('+myContent.myImg+')'}"></div>
         </div>
         <p>{{myContent.myAbstract}}</p>
       </div>
@@ -143,9 +143,11 @@ export default {
         height: 80%
         cursor: pointer
         overflow: hidden
-        img
+        .img-bg
           width: 100%
           height: 100%
+          background-size: cover
+          background-position: center
       p
         width: 85%
         margin: 2% 0

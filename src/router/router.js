@@ -8,6 +8,7 @@ import Home from '@/components/home/home';
 import Articles from '@/components/articles/articles';
 import Photographs from '@/components/photographs/photographs';
 import Contact from '@/components/contact/contact';
+import ArticleDetails from '@/components/home/details/article-details';
 
 export default [
     {
@@ -43,6 +44,11 @@ export default [
                 name: 'contact',
                 path: '/Axue-blog/contact',
                 component: Contact
+            },
+            {
+                name: 'articleDetails',
+                path: '/Axue-blog/articleDetails/:id',
+                component: ArticleDetails
             }
             ]
         },
