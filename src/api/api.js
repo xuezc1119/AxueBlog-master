@@ -10,6 +10,11 @@ var instance = Axios.create({
     }]
 })
 
+var uploadAxios = Axios.create({
+    timeout: 60000,
+    headers: { 'Content-Type': 'multipart/form-data', 'Mdt': 'ws-common' }
+  })
+
 var reqInterceptor = function (config) {
     let params = config.data;
     function isString (o) {
@@ -61,6 +66,20 @@ var resInterceptor = function (response) {
 //     return resInterceptor(response);
 // })
 
+// 请求拦截
+// uploadAxios.interceptors.request.use(function (config) {
+//     let token = sessionStorage.getItem("token");
+//     if (token && token.length) {
+//         config.headers['token'] = sessionStorage.getItem("token");
+//     }
+//     reqInterceptor(config);
+//     return config;
+// })
+// // 响应拦截
+// uploadAxios.interceptors.response.use(function (response) {
+//     return resInterceptor(response);
+// })
+
 // 注册
 export const reqRegister = (params) => { return instance.post(`/api/admin/register`, params).then(res => res).catch(err => err) }
 // 登录
@@ -88,3 +107,5 @@ export const reqDeleteCategory = (params) => { return instance.post(`/api/admin/
 export const reqGetArticleDetails = (params) => { return instance.post(`/api/admin/getArticleDetails`, params).then(res => res).catch(err => err) }
 // 统计所有类别对应数据数量
 export const reqStatisticCategory = (params) => { return instance.post(`/api/admin/statisticCategory`, params).then(res => res).catch(err => err) }
+// 上传图片
+export const reqUploadimg = (params) => { return uploadAxios.post(`/api/admin/uploadimg`, params).then(res => res).catch(err => err) }

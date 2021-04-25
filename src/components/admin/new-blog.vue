@@ -19,7 +19,7 @@
         <span>文章内容：</span>
         <!-- 暂时不要上传图片，图片过大会引起系统错误，后面优化时在参考其他做修改 -->
         <div class="detail-mavon">
-          <mavon-editor v-model="articleContent" @change="onEditorChange"/>
+          <mavon-editor v-model="articleContent" ref="md" @change="onEditorChange" @imgAdd="handleEditorImgAdd" @imgDel="handleEditorImgDel"/>
         </div>
       </div>
       <div class = "content-img">
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { reqSaveArticle, reqUpdateArticle, reqGetCategoryList } from '@/api/api';
+import { reqSaveArticle, reqUpdateArticle, reqGetCategoryList, reqUploadimg } from '@/api/api';
 export default {
   name: 'new-blog',
   props: {
@@ -75,9 +75,24 @@ export default {
     this.categoryName = this.articleInfoDetails.category;
   },
   methods: {
-    onEditorChange(value, render){//编辑器文本发生变化
-      // console.log(value, render);
+    onEditorChange(value, render){ // 编辑器文本发生变化
       console.log(this.articleContent);
+    },
+    handleEditorImgAdd (filename, file) { // 上传图片
+      var formdata = new FormData();
+      formdata.append('files', file);
+      reqUploadimg(formdata).then(res=>{
+        console.log('返回',res);
+        if (res.data.status === 1) {
+          let url = './static/illustration/' + res.data.data.filename;
+          this.$refs.md.$img2Url(filename, url); // 将返回的url替换到文本原位置
+        } else {
+          this.$Message.error('上传失败！');
+        }
+      });
+    },
+    handleEditorImgDel (filename) { //删除图片
+      console.log(filename);
     },
     changeCategory (val) {
       this.categoryName = val.label;
@@ -272,4 +287,6 @@ export default {
     cursor: pointer
 >>> .ivu-select-selected-value, >>> .ivu-select-placeholder
   text-align: left
+>>>.ivu-select-dropdown
+  z-index: 200
 </style>

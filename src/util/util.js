@@ -2,9 +2,8 @@ import marked from 'marked';
 import hljs from "highlight.js"; // 引入 highlight.js
 import "highlight.js/styles/monokai-sublime.css"; // 引入高亮样式 这里我用的是sublime样式
 
-var rendererMD = new marked.Renderer();
 marked.setOptions({
-    renderer: rendererMD,
+    renderer: new marked.Renderer(),
     highlight: function(code) {
         return hljs.highlightAuto(code).value;
     },

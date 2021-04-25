@@ -5,6 +5,16 @@ const path = require('path');
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const { count } = require('console');
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+      cb(null, '../static/illustration'); // 规定上传图片存储的文件夹
+    },
+    filename: function(req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`) // 规定上传图片的名称
+    }
+})
+const upload = multer({ storage: storage });
 
 // 注册
 router.post('/api/admin/register', (req, res) => {
@@ -219,7 +229,7 @@ router.post('/api/admin/getArticleList', (req, res) => {
       }).skip(index).limit(size)
     });
     Promise.all([p1, p2]).then(val => {
-      console.log(val)
+      // console.log(val)
       count = (val[0] && val[0]>=0) ? val[0] : 0;
       res.send({'status': 1, 'data': val[1], 'total': count});
     });
@@ -336,6 +346,16 @@ router.post('/api/admin/statisticCategory', (req, res) => {
     }
     res.send({'status': 1, 'data': data});
   })
+})
+
+// 上传图片到服务器-单个文件上传，暂不考虑多个文件
+router.post('/api/admin/uploadimg', upload.single('files', 40), function(req, res, next) {
+  var files = req.file;
+  if (!files) {
+      res.send('error');
+  } else {
+      res.send({'status': 1, 'data': files});
+  }
 })
 
 module.exports = router;
