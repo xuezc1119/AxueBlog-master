@@ -11,10 +11,19 @@ const storage = multer.diskStorage({
       cb(null, '../static/illustration'); // 规定上传图片存储的文件夹
     },
     filename: function(req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`) // 规定上传图片的名称
+      cb(null, `${Date.now()}-${file.originalname}`) // 规定上传图片的名称-时间戳-名称
     }
 })
+const coverStorage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, '../static/cover'); // 规定上传图片存储的文件夹
+  },
+  filename: function(req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`) // 规定上传图片的名称-时间戳-名称
+  }
+})
 const upload = multer({ storage: storage });
+const coverUpload = multer({ storage: coverStorage });
 
 // 注册
 router.post('/api/admin/register', (req, res) => {
@@ -348,8 +357,18 @@ router.post('/api/admin/statisticCategory', (req, res) => {
   })
 })
 
-// 上传图片到服务器-单个文件上传，暂不考虑多个文件
-router.post('/api/admin/uploadimg', upload.single('files', 40), function(req, res, next) {
+// 富文本编辑器-上传图片到服务器-单个文件上传，暂不考虑多个文件-无需存储到数据库
+router.post('/api/admin/uploadimg', upload.single('files'), function(req, res, next) {
+  var files = req.file;
+  if (!files) {
+      res.send('error');
+  } else {
+      res.send({'status': 1, 'data': files});
+  }
+})
+
+// 上传封面图片
+router.post('/api/admin/uploadCover', coverUpload.single('files'), function(req, res, next) {
   var files = req.file;
   if (!files) {
       res.send('error');

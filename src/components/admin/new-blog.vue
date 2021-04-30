@@ -17,15 +17,24 @@
       </div>
       <div class = "content-detail">
         <span>文章内容：</span>
-        <!-- 暂时不要上传图片，图片过大会引起系统错误，后面优化时在参考其他做修改 -->
         <div class="detail-mavon">
           <mavon-editor v-model="articleContent" ref="md" @change="onEditorChange" @imgAdd="handleEditorImgAdd" @imgDel="handleEditorImgDel"/>
         </div>
       </div>
       <div class = "content-img">
-        <span>上传图片：</span>
-        <!-- 实在是没研究明白file上传图片，所以只能暂时使用这种上传网络地址的方式，以后在研究吧  -->
-        <input type = "text" placeholder="Please enter the img url" v-model = "articleImgUrl">
+        <span>上传封面：</span>
+        <Upload 
+          action=""
+          :format="['jpg','jpeg','png']"
+          accept=".jpg,.jpeg,.png"
+          :max-size="fileMaxSize"
+          :on-format-error="handleFormatError"
+          :on-exceeded-size="handleMaxSize"
+          :before-upload="handleBeforeUpload"
+          :on-success="handleSuccess">
+          <Button icon="ios-cloud-upload-outline">Upload files</Button>
+        </Upload>
+        <p class="img-p" v-if="articleImgUrl" @click="showImg">{{showImgUrl}}</p>
       </div>
     </div>
     <div class = "blog-add">
@@ -35,11 +44,14 @@
     <div class = "blog-back" v-show = "way !== ''" @click.stop = "blogBack">
       <Icon type="md-return-left" size = "24" />
     </div>
+    <Modal v-model="isShowImg" :footer-hide="true">
+      <img :src="articleImgUrl" style="width: 100%;padding: 4%;">
+    </Modal>
   </div>
 </template>
 
 <script>
-import { reqSaveArticle, reqUpdateArticle, reqGetCategoryList, reqUploadimg } from '@/api/api';
+import { reqSaveArticle, reqUpdateArticle, reqGetCategoryList, reqUploadimg, reqUploadCover } from '@/api/api';
 export default {
   name: 'new-blog',
   props: {
@@ -61,7 +73,9 @@ export default {
       articleInfo: {}, // 存储文章内容
       categoryId: '',
       categoryName: '',
-      categoryList: []
+      categoryList: [],
+      fileMaxSize: 2 * 1024 *1024,
+      isShowImg: false
     }
   },
   created () {
@@ -74,6 +88,15 @@ export default {
     this.categoryId = this.articleInfoDetails.categoryId;
     this.categoryName = this.articleInfoDetails.category;
   },
+  computed:{
+    showImgUrl () {
+      let temp = "";
+      if (this.articleImgUrl) {
+        temp = this.articleImgUrl.slice(15);
+      }
+      return temp;
+    }
+  },
   methods: {
     onEditorChange(value, render){ // 编辑器文本发生变化
       console.log(this.articleContent);
@@ -84,7 +107,9 @@ export default {
       reqUploadimg(formdata).then(res=>{
         console.log('返回',res);
         if (res.data.status === 1) {
+          // 以下两种路径都可以
           let url = './static/illustration/' + res.data.data.filename;
+          // let url = 'http://127.0.0.1:9050/static/illustration/' + res.data.data.filename;
           this.$refs.md.$img2Url(filename, url); // 将返回的url替换到文本原位置
         } else {
           this.$Message.error('上传失败！');
@@ -93,6 +118,48 @@ export default {
     },
     handleEditorImgDel (filename) { //删除图片
       console.log(filename);
+    },
+    handleMaxSize (file) {
+      this.$Message.warning("文件大小超限");
+    },
+    handleFormatError (file) {
+      this.$Message.warning("文件格式不正确");
+    },
+    // 上传文件之前
+    handleBeforeUpload (file) {
+      console.log('file', file);
+      let fileIndex = file.name.lastIndexOf('.')
+      let ext = file.name.substr(fileIndex + 1)
+      let arr = ['jpg', 'jpeg', 'png']
+      // 判断 图片 格式和大小
+      if (arr.indexOf(ext) > -1) {
+        if (file.size > this.fileMaxSize) {
+          this.$Message.error('单个文件不超过2M')
+          return false
+        }
+      } else {
+        this.$Message.error('图片格式不正确')
+        return false
+      }
+      var formdata = new FormData();
+      formdata.append('files', file);
+      reqUploadCover(formdata).then(res=>{
+        console.log('返回',res);
+        if (res.data.status === 1) {
+          // 以下两种路径都可以
+          let url = './static/cover/' + res.data.data.filename;
+          console.log('url', url);
+          this.articleImgUrl = url;
+        } else {
+          this.$Message.error('上传失败！');
+        }
+      });
+      // 返回 false 停止自动上传 我们需要手动上传
+      return false
+    },
+    // 上传成功
+    handleSuccess (res, file) {
+      console.log(res, file);
     },
     changeCategory (val) {
       this.categoryName = val.label;
@@ -194,6 +261,9 @@ export default {
     },
     blogBack () { // 更新文章的返回
       this.$emit('blogBack');
+    },
+    showImg () {
+      this.isShowImg = true;
     }
   }
 }
@@ -264,6 +334,19 @@ export default {
         border-radius: 4px
         border: 1px solid rgba(45,45,45,0.2)
         padding: 0 1%
+      .img-p
+        cursor: pointer
+        line-height: 32px;
+        margin-left: 10px;
+        color: blue;
+        text-decoration: underline;
+        width: calc(70% - 137px);
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        &:hover
+          color: #008;
     .content-detail
       width: 100%
       height: 40px

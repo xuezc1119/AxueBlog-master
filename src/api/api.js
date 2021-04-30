@@ -109,3 +109,5 @@ export const reqGetArticleDetails = (params) => { return instance.post(`/api/adm
 export const reqStatisticCategory = (params) => { return instance.post(`/api/admin/statisticCategory`, params).then(res => res).catch(err => err) }
 // 上传图片
 export const reqUploadimg = (params) => { return uploadAxios.post(`/api/admin/uploadimg`, params).then(res => res).catch(err => err) }
+// 上传封面
+export const reqUploadCover = (params) => { return uploadAxios.post(`/api/admin/uploadCover`, params).then(res => res).catch(err => err) }
