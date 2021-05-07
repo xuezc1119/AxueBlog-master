@@ -107,6 +107,8 @@ export const reqDeleteCategory = (params) => { return instance.post(`/api/admin/
 export const reqGetArticleDetails = (params) => { return instance.post(`/api/admin/getArticleDetails`, params).then(res => res).catch(err => err) }
 // 统计所有类别对应数据数量
 export const reqStatisticCategory = (params) => { return instance.post(`/api/admin/statisticCategory`, params).then(res => res).catch(err => err) }
+// 通过分类标签查询文章列表
+export const reqArticlesByCategory = (params) => { return instance.post(`/api/admin/getArticlesByCategory`, params).then(res => res).catch(err => err) }
 // 上传图片
 export const reqUploadimg = (params) => { return uploadAxios.post(`/api/admin/uploadimg`, params).then(res => res).catch(err => err) }
 // 上传封面

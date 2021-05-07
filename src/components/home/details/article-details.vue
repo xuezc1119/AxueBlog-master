@@ -49,8 +49,7 @@ export default {
 
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
-// import url("https://cdn.bootcss.com/highlight.js/9.18.1/styles/monokai-sublime.min.css")
+<style lang="stylus" rel="stylesheet/stylus" scoped>
 .article-details {
   width: 100%;
   height: 100%;

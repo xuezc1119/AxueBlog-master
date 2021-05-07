@@ -371,5 +371,5 @@ export default {
 >>> .ivu-select-selected-value, >>> .ivu-select-placeholder
   text-align: left
 >>>.ivu-select-dropdown
-  z-index: 200
+  z-index: 2000
 </style>

@@ -13,16 +13,16 @@
         </div>
         <div class = "left-box-bottom">
           <div class = "bottom-box">
-            <img :src = "writeImg">
+            <Icon type="md-calendar" size="20" />
             <span>{{item.date}}</span>
           </div>
           <div class = "bottom-box">
-            <img :src = "readImg">
-            <span>3</span>
+            <Icon type="md-eye" size="20" />
+            <span>{{item.visits}}</span>
           </div>
           <div class = "bottom-box">
-            <img :src = "likeImg">
-            <span>9</span>
+            <Icon type="md-pricetags" size="20" />
+            <span>{{item.category}}</span>
           </div>
         </div>
         <img :src = "starImg" class = "left-box-img">
@@ -190,6 +190,7 @@ export default {
         p
           width: 96%
           margin: 2% 0
+          padding: 0 2%;
           color: rgba(44, 62, 80, 0.8)
           text-align: left
           overflow: hidden
@@ -197,6 +198,15 @@ export default {
           display: -webkit-box
           -webkit-box-orient: vertical
           -webkit-line-clamp: 3
+          position: relative
+        p::before
+          content:''
+          position: absolute
+          top: 0
+          left: 0
+          width: 2px
+          height: 100%;
+          background: #666
         @media only screen and (max-width: 878px)
           height: 280px
       .left-box-bottom

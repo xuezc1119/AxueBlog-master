@@ -4,7 +4,7 @@
       <div class = "right-mine-top">
         <span>{{categoryInfo.title}}</span>
       </div>
-      <div class="right-list" v-for="(item, index) in categoryInfo.categoryList" :key="index">{{item._id}}（{{item.total}}）</div>
+      <div class="right-list" v-for="(item, index) in categoryInfo.categoryList" :key="index" @click="showList(index)">{{item.category[0]}}（{{item.total}}）</div>
     </div>
     <div class = "right-message">
       <div class = "right-message-title">{{messageContent.title}}</div>
@@ -72,6 +72,10 @@ export default {
       }).catch(err => {
         console.log(`获取类别catch: ${err}`);
       });
+    },
+    // 点击分类查看文章列表
+    showList (index) {
+      this.$router.push({name: 'articleList', params: {id: this.categoryInfo.categoryList[index]._id}});
     }
   },
   computed: {

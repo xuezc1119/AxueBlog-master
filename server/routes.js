@@ -135,6 +135,7 @@ router.post('/api/admin/saveArticle', (req, res) => {
   articleInfo.date = req.body.date;
   articleInfo.category = req.body.category;
   articleInfo.categoryId = req.body.categoryId;
+  articleInfo.visits = 0;
   let newArticle = new db.Article(articleInfo);
   newArticle.save((err) => {
     if (err) {
@@ -161,6 +162,7 @@ router.post('/api/admin/updateArticle', (req, res) => {
     docs[0].date = details.date;
     docs[0].category = details.category;
     docs[0].categoryId = details.categoryId;
+    docs[0].visits = docs[0].visits;
     db.Article(docs[0]).save((err) => { // 将修改过的文章进行保存，替换原有的文章，也就是更新
       if (err) {
         res.send(err);
@@ -235,7 +237,7 @@ router.post('/api/admin/getArticleList', (req, res) => {
           return;
         }
         resolve(data);
-      }).skip(index).limit(size)
+      }).skip(index).limit(size).sort({date:-1})
     });
     Promise.all([p1, p2]).then(val => {
       // console.log(val)
@@ -342,13 +344,25 @@ router.post('/api/admin/getArticleDetails', (req, res) => {
       res.send(err);
       return;
     }
-    res.send({'status': 1, 'data': data[0]});
+    let temp = data[0].visits + 1;
+    // 更新访问量
+    // 使用findOneAndUpdate才会有返回值
+    // 使用{new:true}才能得到更新后的数据
+    db.Article.findOneAndUpdate({'_id': data[0].id}, {$set:{'visits': temp}},{new:true},(error, doc)=>{
+      if (error) {
+        res.send(error);
+        return;
+      }
+      res.send({'status': 1, 'data': doc});
+    });
   })
 })
 
 // 统计所有类别对应数据数量
 router.post('/api/admin/statisticCategory', (req, res) => {
-  db.Article.aggregate([{$group : {_id : "$category", total : {$sum : 1}}}], (err,data)=>{
+  // 统计$category的总量$sum
+  // $addToSet	在结果文档中插入值到一个数组中，但不创建副本。
+  db.Article.aggregate([{$group : {_id : "$categoryId", category: {$addToSet: "$category"}, total : {$sum : 1}}}], (err,data)=>{
     if (err) {
       res.send(err);
       return;
@@ -357,7 +371,20 @@ router.post('/api/admin/statisticCategory', (req, res) => {
   })
 })
 
-// 富文本编辑器-上传图片到服务器-单个文件上传，暂不考虑多个文件-无需存储到数据库
+// 通过分类标签查询文章列表
+router.post('/api/admin/getArticlesByCategory', (req, res)=>{
+  let cate = req.body.categoryId;
+  db.Article.find({'categoryId': cate}, (err, data)=>{
+    if (err) {
+      res.send(err);
+      return;
+    }
+    console.log(data);
+    res.send({'status': 1, 'data': data});
+  })
+})
+
+// 富文本编辑器-上传图片到服务器-单个文件上传single，暂不考虑多个文件multiple-无需存储到数据库
 router.post('/api/admin/uploadimg', upload.single('files'), function(req, res, next) {
   var files = req.file;
   if (!files) {
