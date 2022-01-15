@@ -17,7 +17,7 @@
     "highlight.js": "^10.7.2",
     "jsbarcode": "^3.11.0",
     "jsonwebtoken": "^8.5.1",
-    "marked": "^2.0.1",
+    "marked": "^4.0.10",
     "mavon-editor": "^2.9.1",
     "moment": "^2.24.0",
     "mongoose": "^5.5.0",
